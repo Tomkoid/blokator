@@ -1,5 +1,3 @@
-#![feature(io_error_uncategorized)]
-
 use clap::Parser;
 use dirs::home_dir;
 use restore::restore;
@@ -30,16 +28,20 @@ const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
 #[clap(author, version, about, long_about = "Easy system-wide adblocker")]
 struct Args {
     /// Start the adblocker
-    #[clap(short, long, value_parser, default_value_t = true)]
+    #[clap(short, long, value_parser, default_value_t = false)]
     start: bool,
 
     /// Sync the adblocker
     #[clap(short = 'S', long, value_parser, default_value_t = false)]
     sync: bool,
 
-    /// Restore the /etc/hosts backup
+    /// Restore /etc/hosts backup
     #[clap(short = 'r', long, value_parser, default_value_t = false)]
-    restore: bool
+    restore: bool,
+
+    /// Create a backup to /etc/hosts.backup
+    #[clap(short = 'b', long, value_parser, default_value_t = false)]
+    backup: bool
 }
 
 fn main() {
@@ -54,6 +56,13 @@ fn main() {
     if args.sync {
         sync();
         println!("==> Synced the adblocker.");
+        exit(0);
+    }
+
+    // Create backup to /etc/hosts.backup
+    if args.backup {
+        backup(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH);
+        println!("==> Created backup.");
         exit(0);
     }
 
@@ -104,12 +113,16 @@ fn main() {
                 println!("==> Cannot restart NetworkManager.service.")
             }
         } else {
-            println!("==> To apply the changes, manually restart your networking service or restart the system");
+            println!("==> To apply the changes, manually restart your networking service or restart the system.");
         }
 
         println!("==> Started the adblocker.");
         exit(0);
     }
+
+    println!("==> No action specified.");
+    println!("Help: see all available arguments with `--help` argument");
+    exit(1);
 }
 
 fn get_data_dir() -> String {
