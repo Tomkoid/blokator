@@ -1,0 +1,5 @@
+# Target folders
+target/
+
+# Auto generated lock files by compiler
+Cargo.lock
