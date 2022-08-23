@@ -61,8 +61,11 @@ fn main() {
     }
 
     if args.sync {
-        sync();
-        println!("==> Synced the adblocker.");
+        if sync() {
+            println!("==> Synced the adblocker.");
+        } else {
+            println!("==> No change.")
+        }
         exit(0);
     }
 
