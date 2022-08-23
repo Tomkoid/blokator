@@ -12,11 +12,13 @@ mod restore;
 mod sync;
 mod apply;
 mod systemd;
+mod initialize_dirs;
 
 use crate::systemd::networkmanager::{ 
                                     networkmanager_exists,
                                     networkmanager_restart
                                     };
+use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::backup::backup;
 use crate::sync::sync;
 use crate::apply::apply;
@@ -52,7 +54,12 @@ fn main() {
         println!("==> Root is required to run the adblocker.");
         exit(1);
     }
-    
+   
+    // Initialize important directories
+    if !already_initialized() {
+        initialize_dir();
+    }
+
     if args.sync {
         sync();
         println!("==> Synced the adblocker.");
@@ -125,9 +132,13 @@ fn main() {
     exit(1);
 }
 
-fn get_data_dir() -> String {
+pub fn get_data_dir() -> String {
     format!(
         "{}/.local/share/adblocker",
         home_dir().unwrap().display()
     )
 }
+
+// fn get_home_dir() -> String {
+//     format!("{}", home_dir().unwrap().display())
+// }
