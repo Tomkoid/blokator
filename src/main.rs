@@ -1,16 +1,14 @@
 use clap::Parser;
 use dirs::home_dir;
-use restore::restore;
 use std::process::exit;
 use nix::unistd::Uid;
 use std::path::Path;
 
 pub mod read;
 pub mod write;
-mod backup;
-mod restore;
+pub mod messages;
+mod copy;
 mod sync;
-mod apply;
 mod systemd;
 mod initialize_dirs;
 
@@ -19,9 +17,8 @@ use crate::systemd::networkmanager::{
                                     networkmanager_restart
                                     };
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
-use crate::backup::backup;
 use crate::sync::sync;
-use crate::apply::apply;
+use crate::copy::copy;
 
 const HOSTS_FILE: &str = "/etc/hosts";
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
@@ -44,6 +41,13 @@ struct Args {
     /// Create a backup to /etc/hosts.backup
     #[clap(short = 'b', long, value_parser, default_value_t = false)]
     backup: bool
+}
+
+#[derive(PartialEq)]
+pub enum Actions {
+    Restore,
+    Backup, 
+    Apply,
 }
 
 fn main() {
@@ -71,14 +75,14 @@ fn main() {
 
     // Create backup to /etc/hosts.backup
     if args.backup {
-        backup(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH);
+        copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
         println!("==> Created backup.");
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
-        restore(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE);
+        copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         if networkmanager_exists() {
             let networkmanager_status = match networkmanager_restart() {
                 Ok(s) => s,
@@ -105,11 +109,11 @@ fn main() {
         
         if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
             // Backup /etc/hosts to /etc/hosts.backup
-            backup(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH); 
+            copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup); 
         }
 
         // Rewrite /etc/hosts
-        apply(&local_hosts, HOSTS_FILE);
+        copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
         if networkmanager_exists() {
             let networkmanager_status = match networkmanager_restart() {

@@ -1,19 +1,21 @@
 use std::io::ErrorKind;
 use std::process::exit;
 
-use crate::{write::write_to_file, read::read_file_to_string};
+use crate::{write::write_to_file, read::read_file_to_string, Actions};
+use crate::messages::Messages;
 
-pub fn restore(
-    path_to_backup_file: &str,
-    path_to_hosts: &str
-    ) {
+pub fn copy(from: &str, to: &str, action: Actions) {
+    let messages;
 
-    let output = match read_file_to_string(path_to_backup_file) {
+    messages = Messages::new(action);
+
+    let output = match read_file_to_string(from) {
         Ok(s) => s,
         Err(e) => match e.kind() {
             ErrorKind::NotFound => {
                 println!(
-                    "==> Tried to restore the backup, but it doesn't even exist: {} (Kind: {})",
+                    "==> {}: {} (Kind: {})",
+                    messages.not_found,
                     e,
                     e.kind()
                 );
@@ -21,7 +23,8 @@ pub fn restore(
             }
             ErrorKind::PermissionDenied => {
                 println!(
-                    "==> Permission denied: {} (Kind: {})",
+                    "==> {}: {} (Kind: {})",
+                    messages.permission_denied,
                     e,
                     e.kind()
                 );
@@ -29,7 +32,8 @@ pub fn restore(
             }
             _ => {
                 println!(
-                    "==> Error occurred: {} (Kind: {})",
+                    "==> {}: {} (Kind: {})",
+                    messages.unknown_error,
                     e,
                     e.kind()
                 );
@@ -38,5 +42,5 @@ pub fn restore(
         }
     };
 
-    write_to_file(path_to_hosts, output)
+    write_to_file(to, output)
 }
