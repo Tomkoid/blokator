@@ -122,6 +122,13 @@ fn main() {
             "{}/hosts",
             get_data_dir()
         );
+        if !Path::new(&local_hosts).exists() {
+            println!("{}==>{} Can't apply, because the local hosts are missing.", colors.bold_red, colors.reset);
+            exit(1);
+        } else if !Path::new(HOSTS_FILE).exists() {
+            println!("{}==>{} Can't apply, because the /etc/hosts file is missing.", colors.bold_red, colors.reset);
+            exit(1);
+        }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
             println!("{}==>{} Latest ad list update is already applied.", colors.bold_yellow, colors.reset);
             exit(1);
