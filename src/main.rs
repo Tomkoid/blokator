@@ -3,7 +3,6 @@ use dirs::home_dir;
 use std::process::exit;
 use nix::unistd::Uid;
 use std::path::Path;
-use std::env;
 
 pub mod read;
 pub mod write;
