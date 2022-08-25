@@ -6,6 +6,7 @@ Cargo.lock
 
 # Pacman auto generated files
 *.pkg.tar.zst
+*.pkg.tar.zst.sig
 archlinux-pkgbuild/src
 archlinux-pkgbuild/target
 archlinux-pkgbuild/pkg
