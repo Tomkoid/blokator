@@ -124,7 +124,7 @@ fn main() {
         );
         if !Path::new(&local_hosts).exists() {
             println!("{}==>{} Can't apply, because the local hosts are missing.", colors.bold_red, colors.reset);
-            println!("{}Help:{} run blokator with `--sync` argument`");
+            println!("{}Help:{} run blokator with `--sync` argument`", colors.bold_green, colors.reset);
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
             println!("{}==>{} Can't apply, because the /etc/hosts file is missing.", colors.bold_red, colors.reset);
