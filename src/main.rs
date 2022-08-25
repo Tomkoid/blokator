@@ -34,15 +34,15 @@ struct Args {
     apply: bool,
 
     /// Sync the adblocker
-    #[clap(short = 'S', long, value_parser, default_value_t = false)]
+    #[clap(short, long, value_parser, default_value_t = false)]
     sync: bool,
 
     /// Restore /etc/hosts backup
-    #[clap(short = 'r', long, value_parser, default_value_t = false)]
+    #[clap(short, long, value_parser, default_value_t = false)]
     restore: bool,
 
     /// Create a backup to /etc/hosts.backup
-    #[clap(short = 'b', long, value_parser, default_value_t = false)]
+    #[clap(short, long, value_parser, default_value_t = false)]
     backup: bool
 }
 
@@ -124,6 +124,7 @@ fn main() {
         );
         if !Path::new(&local_hosts).exists() {
             println!("{}==>{} Can't apply, because the local hosts are missing.", colors.bold_red, colors.reset);
+            println!("{}Help:{} run blokator with `--sync` argument`");
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
             println!("{}==>{} Can't apply, because the /etc/hosts file is missing.", colors.bold_red, colors.reset);
