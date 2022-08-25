@@ -12,6 +12,7 @@ mod sync;
 mod systemd;
 mod initialize_dirs;
 
+use crate::read::read_file_to_string;
 use crate::systemd::networkmanager::{ 
                                     networkmanager_exists,
                                     networkmanager_restart
@@ -28,7 +29,7 @@ const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
 struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
-    start: bool,
+    apply: bool,
 
     /// Sync the adblocker
     #[clap(short = 'S', long, value_parser, default_value_t = false)]
@@ -82,6 +83,10 @@ fn main() {
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
+        if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
+            println!("==> Backup already restored.");
+            exit(1);
+        }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         if networkmanager_exists() {
             let networkmanager_status = match networkmanager_restart() {
@@ -95,18 +100,22 @@ fn main() {
                 println!("==> Cannot restart NetworkManager.service.")
             }
         } else {
-            println!("==> To apply the changes, manually restart your networking service or restart the system");
+            println!("==> Manually restart your networking service or restart the system to apply changes.");
         }
         println!("==> Restored the backup.");
         exit(0);
     }
 
-    if args.start {
+    if args.apply {
         let local_hosts = format!(
             "{}/hosts",
             get_data_dir()
         );
-        
+        if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
+            println!("==> Latest ad list update is already applied.");
+            exit(1);
+        }
+               
         if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
             // Backup /etc/hosts to /etc/hosts.backup
             copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup); 
