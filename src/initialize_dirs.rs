@@ -9,15 +9,12 @@ pub fn already_initialized() -> bool {
 }
 
 pub fn initialize_dir() {
-    match fs::create_dir_all(get_data_dir()) {
-        Ok(_) => {},
-        Err(e) => {
-            println!(
-                "==> Error occurred when initializing dirs: {} (Kind: {})",
-                e,
-                e.kind()
-            );
-            exit(1)
-        }
-    }
+    fs::create_dir_all(get_data_dir()).unwrap_or_else(|e| {
+        println!(
+            "==> Error occurred when initializing dirs: {} (Kind: {})",
+            e,
+            e.kind()
+        );
+        exit(1);
+    })
 }

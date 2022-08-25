@@ -1,25 +1,25 @@
 use crate::Actions;
 
-pub struct Messages<'a> {
+pub struct CopyMessages<'a> {
     pub not_found: &'a str,
     pub permission_denied: &'a str,
     pub unknown_error: &'a str,
 }
 
-impl Messages<'_> {
-    pub fn new(action: Actions) -> Messages<'static> {
+impl CopyMessages<'_> {
+    pub fn new(action: Actions) -> CopyMessages<'static> {
         match action {
-            Actions::Restore => { Messages {
+            Actions::Restore => { CopyMessages {
                 not_found: "Tried to restore the backup, but it doesn't exist",
                 permission_denied: "Permission Denied",
                 unknown_error: "Error occurred"
             } },
-            Actions::Backup => { Messages {
+            Actions::Backup => { CopyMessages {
                 not_found: "Tried to backup the /etc/hosts file, but it doesn't exist",
                 permission_denied: "Permission denied",
                 unknown_error: "Error occured"
             } },
-            Actions::Apply => { Messages {
+            Actions::Apply => { CopyMessages {
                 not_found: "Tried to start the adblocker, but the /etc/hosts file doesn't exist",
                 permission_denied: "Permission Denied",
                 unknown_error: "Error occured"

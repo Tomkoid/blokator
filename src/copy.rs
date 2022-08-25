@@ -2,10 +2,10 @@ use std::io::ErrorKind;
 use std::process::exit;
 
 use crate::{write::write_to_file, read::read_file_to_string, Actions};
-use crate::messages::Messages;
+use crate::messages::CopyMessages;
 
 pub fn copy(from: &str, to: &str, action: Actions) {
-    let messages = Messages::new(action);
+    let messages = CopyMessages::new(action);
 
     let output = match read_file_to_string(from) {
         Ok(s) => s,

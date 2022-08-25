@@ -3,15 +3,18 @@ use dirs::home_dir;
 use std::process::exit;
 use nix::unistd::Uid;
 use std::path::Path;
+use std::env;
 
 pub mod read;
 pub mod write;
 pub mod messages;
+pub mod colors;
 mod copy;
 mod sync;
 mod systemd;
 mod initialize_dirs;
 
+use crate::colors::{Colors, check_no_color_env};
 use crate::read::read_file_to_string;
 use crate::systemd::networkmanager::{ 
                                     networkmanager_exists,
@@ -52,11 +55,20 @@ pub enum Actions {
 }
 
 fn main() {
+    let colors: Colors;
+
+    // If user runs blokator with NO_COLOR flag
+    if check_no_color_env() {
+        colors = Colors::new_without_colors();
+    } else {
+        colors = Colors::new();
+    }
+
     let args = Args::parse();
 
     // Check if the program is running with root permissions
     if !Uid::effective().is_root() {
-        println!("==> Root is required to run the adblocker.");
+        println!("{}==>{} Root is required to run the adblocker.", colors.bold_red, colors.reset);
         exit(1);
     }
    
@@ -67,9 +79,9 @@ fn main() {
 
     if args.sync {
         if sync() {
-            println!("==> Synced the adblocker.");
+            println!("{}==>{} Synced the adblocker.", colors.bold_green, colors.reset);
         } else {
-            println!("==> No change.")
+            println!("{}==>{} No change.", colors.bold_yellow, colors.reset)
         }
         exit(0);
     }
@@ -77,14 +89,14 @@ fn main() {
     // Create backup to /etc/hosts.backup
     if args.backup {
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("==> Created backup.");
+        println!("{}==>{} Created backup.", colors.bold_green, colors.reset);
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("==> Backup already restored.");
+            println!("{}==>{} Backup already restored.", colors.bold_yellow, colors.reset);
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
@@ -95,14 +107,14 @@ fn main() {
             };
 
             if networkmanager_status.success() {
-                println!("==> Restarted NetworkManager.service.");
+                println!("{}==>{} Restarted NetworkManager.service.", colors.bold_yellow, colors.reset);
             } else {
-                println!("==> Cannot restart NetworkManager.service.")
+                println!("{}==>{} Cannot restart NetworkManager.service.", colors.bold_red, colors.reset)
             }
         } else {
-            println!("==> Manually restart your networking service or restart the system to apply changes.");
+            println!("{}==>{} Manually restart your networking service or restart the system to apply changes.", colors.bold_yellow, colors.reset);
         }
-        println!("==> Restored the backup.");
+        println!("{}==>{} Restored the backup.", colors.bold_green, colors.reset);
         exit(0);
     }
 
@@ -112,7 +124,7 @@ fn main() {
             get_data_dir()
         );
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("==> Latest ad list update is already applied.");
+            println!("{}==>{} Latest ad list update is already applied.", colors.bold_yellow, colors.reset);
             exit(1);
         }
                
@@ -131,20 +143,20 @@ fn main() {
             };
 
             if networkmanager_status.success() {
-                println!("==> Restarted NetworkManager.service.");
+                println!("{}==>{} Restarted NetworkManager.service.", colors.bold_green, colors.reset);
             } else {
-                println!("==> Cannot restart NetworkManager.service.")
+                println!("{}==>{} Cannot restart NetworkManager.service.", colors.bold_red, colors.reset)
             }
         } else {
-            println!("==> To apply the changes, manually restart your networking service or restart the system.");
+            println!("{}==>{} To apply the changes, manually restart your networking service or restart the system.", colors.bold_yellow, colors.reset);
         }
 
-        println!("==> Started the adblocker.");
+        println!("{}==>{} Started the adblocker.", colors.bold_green, colors.reset);
         exit(0);
     }
 
-    println!("==> No action specified.");
-    println!("Help: see all available arguments with `--help` argument");
+    println!("{}==>{} No action specified.", colors.bold_red, colors.reset);
+    println!("{}Help:{} see all available arguments with `--help` argument", colors.bold_green, colors.reset);
     exit(1);
 }
 
