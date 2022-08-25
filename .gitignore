@@ -3,3 +3,9 @@ target/
 
 # Auto generated lock files by compiler
 Cargo.lock
+
+# Pacman auto generated files
+*.pkg.tar.zst
+archlinux-pkgbuild/src
+archlinux-pkgbuild/target
+archlinux-pkgbuild/pkg
