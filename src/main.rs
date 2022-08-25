@@ -44,7 +44,7 @@ struct Args {
     backup: bool
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Actions {
     Restore,
     Backup, 
