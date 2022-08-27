@@ -11,7 +11,15 @@ pub struct GenericMessages<'a> {
     pub networkmanager_couldnt_restart: &'a str,
     pub networkmanager_restart_manually: &'a str,
     pub local_hosts_missing: &'a str,
-    pub etc_hosts_missing: &'a str
+    pub etc_hosts_missing: &'a str,
+    pub already_applied: &'a str,
+    pub adblocker_started: &'a str,
+    pub no_action_specified: &'a str
+}
+
+pub struct HelpMessages<'a> {
+    pub local_hosts_missing: &'a str,
+    pub no_action_specified: &'a str
 }
 
 pub struct CopyMessages<'a> {
@@ -21,7 +29,7 @@ pub struct CopyMessages<'a> {
 }
 
 impl GenericMessages<'_> {
-    pub fn new() -> GenericMessages<'static> {
+    pub const fn new() -> GenericMessages<'static> {
         GenericMessages { 
             root_is_required: "You need to run this command with root privilegies, to run the adblocker",
             synced: "Synced the adblocker.",
@@ -33,7 +41,19 @@ impl GenericMessages<'_> {
             networkmanager_couldnt_restart: "Couldn't restart NetworkManager.service.",
             networkmanager_restart_manually: "Manually restart the networking service or restart the system.",
             local_hosts_missing: "Can't apply, because the local hosts are missing.",
-            etc_hosts_missing: "Can't apply, because the /etc/hosts file is missing."
+            etc_hosts_missing: "Can't apply, because the /etc/hosts file is missing.",
+            already_applied: "Latest ad list already applied.",
+            adblocker_started: "Blokator started.",
+            no_action_specified: "No action specified."
+        }
+    }
+}
+
+impl HelpMessages<'_> {
+    pub const fn new() -> HelpMessages<'static> {
+        HelpMessages { 
+            local_hosts_missing: "run blokator with `--sync` argument.",
+            no_action_specified: "run blokator with `--help` argument to see all available commands."
         }
     }
 }
