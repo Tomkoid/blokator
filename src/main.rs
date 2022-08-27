@@ -1,8 +1,10 @@
 use clap::Parser;
 use dirs::home_dir;
 use std::process::exit;
-use nix::unistd::Uid;
 use std::path::Path;
+
+#[cfg(target_os = "linux")]
+use nix::unistd::Uid;
 
 pub mod read;
 pub mod write;
@@ -12,6 +14,12 @@ mod copy;
 mod sync;
 mod systemd;
 mod initialize_dirs;
+
+#[cfg(target_family = "windows")]
+mod windows;
+
+#[cfg(target_family = "windows")]
+use crate::windows::is_elevated;
 
 use crate::colors::{Colors, check_no_color_env};
 use crate::messages::{GenericMessages, HelpMessages};
@@ -24,14 +32,21 @@ use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
 
+#[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
+#[cfg(target_family = "unix")]
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
+
+#[cfg(target_family = "windows")]
+const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
+#[cfg(target_family = "windows")]
+const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
 
 const MESSAGES: GenericMessages = GenericMessages::new();
 const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = "Easy system-wide adblocker")]
+#[clap(author = "Tomas Zierl", version, about, long_about = "Easy system-wide adblocker")]
 struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
@@ -70,7 +85,14 @@ fn main() {
     let args = Args::parse();
 
     // Check if the program is running with root permissions
+    #[cfg(target_family = "unix")]
     if !Uid::effective().is_root() {
+        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
+        exit(1);
+    }
+
+    #[cfg(target_family = "windows")]
+    if !is_elevated() {
         println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
         exit(1);
     }
