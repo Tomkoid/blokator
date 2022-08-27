@@ -9,11 +9,10 @@ pub fn already_initialized() -> bool {
 }
 
 pub fn initialize_dir() {
-    let colors: Colors;
+    let mut colors = Colors::new_without_colors();
 
-    if check_no_color_env() {
-        colors = Colors::new_without_colors();
-    } else {
+    #[cfg(target_family = "unix")]
+    if !check_no_color_env() {
         colors = Colors::new();
     }
 

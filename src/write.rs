@@ -4,11 +4,10 @@ use std::fs;
 use crate::colors::{Colors, check_no_color_env};
 
 pub fn write_to_file(path: &str, contents: String) {
-    let colors: Colors;
-
-    if check_no_color_env() {
-        colors = Colors::new_without_colors();
-    } else {
+    let mut colors = Colors::new_without_colors();
+    
+    #[cfg(target_family = "unix")]
+    if !check_no_color_env() {
         colors = Colors::new();
     }
 
