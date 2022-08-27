@@ -82,7 +82,7 @@ fn main() {
 
     if args.sync {
         if sync() {
-            println!("{}==>{} {}", MESSAGES.synced, colors.bold_green, colors.reset);
+            println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.synced);
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.synced_no_change)
         }
