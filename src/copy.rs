@@ -6,11 +6,10 @@ use crate::{write::write_to_file, read::read_file_to_string, Actions};
 use crate::messages::CopyMessages;
 
 pub fn copy(from: &str, to: &str, action: Actions) {
-    let colors: Colors;
+    let mut colors = Colors::new_without_colors();
 
-    if check_no_color_env() {
-        colors = Colors::new_without_colors();
-    } else {
+    #[cfg(target_family = "unix")]
+    if !check_no_color_env() {
         colors = Colors::new();
     }
 

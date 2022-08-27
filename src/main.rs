@@ -1,3 +1,5 @@
+#![feature(stmt_expr_attributes)]
+
 use clap::Parser;
 use dirs::home_dir;
 use std::process::exit;
@@ -73,12 +75,11 @@ pub enum Actions {
 }
 
 fn main() {
-    let colors: Colors;
+    let mut colors = Colors::new_without_colors();
 
     // If user runs blokator with NO_COLOR flag
-    if check_no_color_env() {
-        colors = Colors::new_without_colors();
-    } else {
+    #[cfg(target_family = "unix")]
+    if !check_no_color_env() {
         colors = Colors::new();
     }
 
