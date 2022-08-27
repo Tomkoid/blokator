@@ -22,7 +22,7 @@ Now CD into that directory:
 cd blokator
 ```
 
-In that directory we can compile blokator:
+In that directory we can compile Blokator:
 
 ```
 cargo build --release
@@ -32,4 +32,16 @@ And install it to the system:
 
 ```
 sudo cp target/release/blokator /usr/bin/blokator
+```
+
+**You're done now!**
+
+### From package manager
+At this moment, Blokator is available only in [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) for **[Arch Linux](https://archlinux.org)**.
+
+Installation guide for [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) is in README.
+
+You can install **Blokator** with pacman:
+```
+sudo pacman -Sy blokator
 ```
