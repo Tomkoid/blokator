@@ -14,7 +14,7 @@ mod systemd;
 mod initialize_dirs;
 
 use crate::colors::{Colors, check_no_color_env};
-use crate::messages::GenericMessages;
+use crate::messages::{GenericMessages, HelpMessages};
 use crate::read::read_file_to_string;
 use crate::systemd::networkmanager::{ 
                                     networkmanager_exists,
@@ -26,6 +26,9 @@ use crate::copy::copy;
 
 const HOSTS_FILE: &str = "/etc/hosts";
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
+
+const MESSAGES: GenericMessages = GenericMessages::new();
+const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = "Easy system-wide adblocker")]
@@ -56,7 +59,6 @@ pub enum Actions {
 
 fn main() {
     let colors: Colors;
-    let messages = GenericMessages::new();
 
     // If user runs blokator with NO_COLOR flag
     if check_no_color_env() {
@@ -69,7 +71,7 @@ fn main() {
 
     // Check if the program is running with root permissions
     if !Uid::effective().is_root() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, messages.root_is_required,);
+        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required,);
         exit(1);
     }
    
@@ -80,9 +82,9 @@ fn main() {
 
     if args.sync {
         if sync() {
-            println!("{}==>{} {}", messages.synced, colors.bold_green, colors.reset);
+            println!("{}==>{} {}", MESSAGES.synced, colors.bold_green, colors.reset);
         } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.synced_no_change)
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.synced_no_change)
         }
         exit(0);
     }
@@ -90,14 +92,14 @@ fn main() {
     // Create backup to /etc/hosts.backup
     if args.backup {
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.created_backup);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.created_backup);
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.backup_already_restored);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.backup_already_restored);
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
@@ -108,14 +110,14 @@ fn main() {
             };
 
             if networkmanager_status.success() {
-                println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.networkmanager_restart);
+                println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart);
             } else {
-                println!("{}==>{} {}", colors.bold_red, colors.reset, messages.networkmanager_couldnt_restart)
+                println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.networkmanager_couldnt_restart)
             }
         } else {
-            println!("{}==>{} Manually restart your networking service or restart the system to apply changes.", colors.bold_yellow, colors.reset);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
         }
-        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.backup_restored);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.backup_restored);
         exit(0);
     }
 
@@ -125,15 +127,15 @@ fn main() {
             get_data_dir()
         );
         if !Path::new(&local_hosts).exists() {
-            println!("{}==>{} {}", colors.bold_red, colors.reset, messages.local_hosts_missing);
-            println!("{}Help:{} run blokator with `--sync` argument`", colors.bold_green, colors.reset);
+            println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.local_hosts_missing);
+            println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.local_hosts_missing);
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("{}==>{} {}", colors.bold_red, colors.reset, messages.etc_hosts_missing);
+            println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.etc_hosts_missing);
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("{}==>{} Latest ad list update is already applied.", colors.bold_yellow, colors.reset);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.already_applied);
             exit(1);
         }
                
@@ -152,15 +154,15 @@ fn main() {
             };
 
             if networkmanager_status.success() {
-                println!("{}==>{} Restarted NetworkManager.service.", colors.bold_green, colors.reset);
+                println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.networkmanager_restart);
             } else {
-                println!("{}==>{} Cannot restart NetworkManager.service.", colors.bold_red, colors.reset)
+                println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.networkmanager_couldnt_restart);
             }
         } else {
-            println!("{}==>{} To apply the changes, manually restart your networking service or restart the system.", colors.bold_yellow, colors.reset);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
         }
 
-        println!("{}==>{} Started the adblocker.", colors.bold_green, colors.reset);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
         exit(0);
     }
 
