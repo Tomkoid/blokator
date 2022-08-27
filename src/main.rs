@@ -71,7 +71,7 @@ fn main() {
 
     // Check if the program is running with root permissions
     if !Uid::effective().is_root() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required,);
+        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
         exit(1);
     }
    
