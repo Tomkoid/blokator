@@ -14,6 +14,7 @@ mod systemd;
 mod initialize_dirs;
 
 use crate::colors::{Colors, check_no_color_env};
+use crate::messages::GenericMessages;
 use crate::read::read_file_to_string;
 use crate::systemd::networkmanager::{ 
                                     networkmanager_exists,
@@ -55,6 +56,7 @@ pub enum Actions {
 
 fn main() {
     let colors: Colors;
+    let messages = GenericMessages::new();
 
     // If user runs blokator with NO_COLOR flag
     if check_no_color_env() {
@@ -67,7 +69,7 @@ fn main() {
 
     // Check if the program is running with root permissions
     if !Uid::effective().is_root() {
-        println!("{}==>{} Root is required to run the adblocker.", colors.bold_red, colors.reset);
+        println!("{}==>{} {}", colors.bold_red, colors.reset, messages.root_is_required,);
         exit(1);
     }
    
@@ -78,9 +80,9 @@ fn main() {
 
     if args.sync {
         if sync() {
-            println!("{}==>{} Synced the adblocker.", colors.bold_green, colors.reset);
+            println!("{}==>{} {}", messages.synced, colors.bold_green, colors.reset);
         } else {
-            println!("{}==>{} No change.", colors.bold_yellow, colors.reset)
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.synced_no_change)
         }
         exit(0);
     }
@@ -88,14 +90,14 @@ fn main() {
     // Create backup to /etc/hosts.backup
     if args.backup {
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("{}==>{} Created backup.", colors.bold_green, colors.reset);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.created_backup);
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("{}==>{} Backup already restored.", colors.bold_yellow, colors.reset);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.backup_already_restored);
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
@@ -106,14 +108,14 @@ fn main() {
             };
 
             if networkmanager_status.success() {
-                println!("{}==>{} Restarted NetworkManager.service.", colors.bold_yellow, colors.reset);
+                println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.networkmanager_restart);
             } else {
-                println!("{}==>{} Cannot restart NetworkManager.service.", colors.bold_red, colors.reset)
+                println!("{}==>{} {}", colors.bold_red, colors.reset, messages.networkmanager_couldnt_restart)
             }
         } else {
             println!("{}==>{} Manually restart your networking service or restart the system to apply changes.", colors.bold_yellow, colors.reset);
         }
-        println!("{}==>{} Restored the backup.", colors.bold_green, colors.reset);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.backup_restored);
         exit(0);
     }
 
@@ -123,11 +125,11 @@ fn main() {
             get_data_dir()
         );
         if !Path::new(&local_hosts).exists() {
-            println!("{}==>{} Can't apply, because the local hosts are missing.", colors.bold_red, colors.reset);
+            println!("{}==>{} {}", colors.bold_red, colors.reset, messages.local_hosts_missing);
             println!("{}Help:{} run blokator with `--sync` argument`", colors.bold_green, colors.reset);
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("{}==>{} Can't apply, because the /etc/hosts file is missing.", colors.bold_red, colors.reset);
+            println!("{}==>{} {}", colors.bold_red, colors.reset, messages.etc_hosts_missing);
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {

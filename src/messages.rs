@@ -1,9 +1,41 @@
 use crate::Actions;
 
+pub struct GenericMessages<'a> {
+    pub root_is_required: &'a str,
+    pub synced: &'a str,
+    pub synced_no_change: &'a str,
+    pub created_backup: &'a str,
+    pub backup_already_restored: &'a str,
+    pub backup_restored: &'a str,
+    pub networkmanager_restart: &'a str,
+    pub networkmanager_couldnt_restart: &'a str,
+    pub networkmanager_restart_manually: &'a str,
+    pub local_hosts_missing: &'a str,
+    pub etc_hosts_missing: &'a str
+}
+
 pub struct CopyMessages<'a> {
     pub not_found: &'a str,
     pub permission_denied: &'a str,
     pub unknown_error: &'a str,
+}
+
+impl GenericMessages<'_> {
+    pub fn new() -> GenericMessages<'static> {
+        GenericMessages { 
+            root_is_required: "You need to run this command with root privilegies, to run the adblocker",
+            synced: "Synced the adblocker.",
+            synced_no_change: "No change",
+            created_backup: "Backup created.",
+            backup_already_restored: "Backup already restored.",
+            backup_restored: "Backup restored.",
+            networkmanager_restart: "Restarted NetworkManager.service successfully.",
+            networkmanager_couldnt_restart: "Couldn't restart NetworkManager.service.",
+            networkmanager_restart_manually: "Manually restart the networking service or restart the system.",
+            local_hosts_missing: "Can't apply, because the local hosts are missing.",
+            etc_hosts_missing: "Can't apply, because the /etc/hosts file is missing."
+        }
+    }
 }
 
 impl CopyMessages<'_> {
