@@ -17,3 +17,7 @@ clap = { version = "3.2.17", default-features = false, features = ["std", "deriv
 dirs = "4.0.0"
 nix = "0.25.0"
 ureq = "2.5.0"
+
+[target.'cfg(windows)'.dependencies]
+winapi = {version = "0.3.8", features = ["winuser", "handleapi", "processthreadsapi", "securitybaseapi"]}
+libc = "0.2.66"
