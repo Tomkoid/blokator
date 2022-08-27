@@ -166,8 +166,8 @@ fn main() {
         exit(0);
     }
 
-    println!("{}==>{} No action specified.", colors.bold_red, colors.reset);
-    println!("{}Help:{} see all available arguments with `--help` argument", colors.bold_green, colors.reset);
+    println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
+    println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);
     exit(1);
 }
 
@@ -177,7 +177,3 @@ pub fn get_data_dir() -> String {
         home_dir().unwrap().display()
     )
 }
-
-// fn get_home_dir() -> String {
-//     format!("{}", home_dir().unwrap().display())
-// }
