@@ -2,6 +2,7 @@
 
 use clap::Parser;
 use dirs::home_dir;
+use std::fs;
 use std::process::exit;
 use std::path::Path;
 
@@ -16,6 +17,7 @@ mod copy;
 mod sync;
 mod systemd;
 mod initialize_dirs;
+mod repos;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -33,6 +35,7 @@ use crate::systemd::networkmanager::{
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
+use crate::repos::add_repo;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -64,7 +67,11 @@ struct Args {
 
     /// Create a backup to /etc/hosts.backup
     #[clap(short, long, value_parser, default_value_t = false)]
-    backup: bool
+    backup: bool,
+
+    /// Add repo for hosts files
+    #[clap(long, value_parser, default_value = "none")]
+    add_repo: String
 }
 
 #[derive(PartialEq, Eq)]
@@ -103,12 +110,60 @@ fn main() {
         initialize_dir();
     }
 
+    if args.add_repo != "none" {
+        add_repo(args.add_repo);
+        exit(1);
+    }
+
     if args.sync {
-        if sync() {
-            println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.synced);
-        } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.synced_no_change)
+        let repos_file_location = format!(
+            "{}/repos",
+            get_data_dir()
+        );
+
+        let local_hosts = format!(
+            "{}/hosts",
+            get_data_dir()
+        );
+
+        let local_hosts_output = read_file_to_string(&local_hosts).unwrap();
+        
+        if Path::new(&local_hosts).exists() {
+            fs::write(&local_hosts, "");
         }
+
+        let repos = read_file_to_string(&repos_file_location).unwrap();
+        for repo in repos.lines() {
+            if repo == "" {
+                continue;
+            }
+
+            println!(
+                "{}==>{} Syncing {}..",
+                colors.bold_blue,
+                colors.reset,
+                repo,
+            );
+
+            sync(repo)
+        }
+
+        let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
+
+        if changed {
+            println!(
+                "{}==>{} Synced all repos successfully.",
+                colors.bold_green,
+                colors.reset
+            );
+        } else {
+            println!(
+                "{}==>{} Nothing changed.",
+                colors.bold_yellow,
+                colors.reset
+            );
+        }
+
         exit(0);
     }
 
