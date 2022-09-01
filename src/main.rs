@@ -35,7 +35,7 @@ use crate::systemd::networkmanager::{
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
-use crate::repos::{add_repo, list_repos};
+use crate::repos::{add_repo, list_repos, del_repo};
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -75,7 +75,11 @@ struct Args {
 
     /// List all repos
     #[clap(short, long, value_parser, default_value_t = false)]
-    list_repos: bool
+    list_repos: bool,
+
+    /// Delete specified repo from the repo list
+    #[clap(short, long, value_parser, default_value = "none")]
+    del_repo: String
 }
 
 #[derive(PartialEq, Eq)]
@@ -119,12 +123,17 @@ fn main() {
         for repo in repos_list {
             println!("{}", repo);
         }
-        exit(1);
+        exit(0);
     }
 
     if args.add_repo != "none" {
         add_repo(args.add_repo);
-        exit(1);
+        exit(0);
+    }
+
+    if args.del_repo != "none" {
+        del_repo(args.del_repo);
+        exit(0);
     }
 
     if args.sync {

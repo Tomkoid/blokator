@@ -62,10 +62,9 @@ pub fn add_repo(repo: String) {
     let mut output = read_file_to_string(&file_location).unwrap();
 
     for i in output.lines() {
-        println!("{}:{}", i, repo);
         if i == repo {
             println!(
-                "{}==>{} The repo you're trying to add, already exists in repos list.",
+                "{}==>{} The repo you're trying to add already exists in repos list.",
                 colors.bold_red,
                 colors.reset
             );
@@ -85,4 +84,46 @@ pub fn add_repo(repo: String) {
         colors.bold_green,
         colors.reset
     );
+}
+
+pub fn del_repo(repo: String) {
+    let mut colors = Colors::new_without_colors();
+
+    #[cfg(target_family = "unix")]
+    if !check_no_color_env() {
+        colors = Colors::new();
+    }
+
+    let repos_file_location = format!(
+        "{}/repos",
+        get_data_dir()
+    );
+
+    if Path::new(&repos_file_location).exists() {
+        let mut repos = read_file_to_string(&repos_file_location).unwrap();
+        if !repos.contains(&repo) {
+            println!(
+                "{}==>{} The repo you're trying to delete doesn't exist",
+                colors.bold_red,
+                colors.reset
+            );
+            exit(1);
+        }
+        repos = repos.replace(&repo, "").replace("\n", "");
+        write_to_file(&repos_file_location, repos);
+        println!(
+            "{}==>{} Deleted {} from the repo list.",
+            colors.bold_green,
+            colors.reset,
+            repo
+        );
+    } else {
+        println!(
+            "{}==>{} Failed to delete {} from the repo list, because the repo list doesn't exist.",
+            colors.bold_red,
+            colors.reset,
+            repo
+        );
+        exit(1);
+    }
 }
