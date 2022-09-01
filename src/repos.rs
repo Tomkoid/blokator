@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::process::exit;
 use std::path::Path;
 use crate::Colors;
@@ -40,7 +39,7 @@ pub fn list_repos() -> Vec<String> {
 
     let mut repos_list: Vec<String> = [].to_vec();
     for repo in repos.lines() {
-        if repo == "" {
+        if repo.is_empty() {
             continue;
         }
 
@@ -109,7 +108,7 @@ pub fn del_repo(repo: String) {
             );
             exit(1);
         }
-        repos = repos.replace(&repo, "").replace("\n", "");
+        repos = repos.replace(&repo, "").replace('\n', "");
         write_to_file(&repos_file_location, repos);
         println!(
             "{}==>{} Deleted {} from the repo list.",

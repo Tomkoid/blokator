@@ -1,5 +1,3 @@
-#![feature(stmt_expr_attributes)]
-
 use clap::Parser;
 use dirs::home_dir;
 use std::fs;
@@ -70,7 +68,7 @@ struct Args {
     backup: bool,
 
     /// Add repo for hosts files
-    #[clap(long, value_parser, default_value = "none")]
+    #[clap(short = 'm', long, value_parser, default_value = "none")]
     add_repo: String,
 
     /// List all repos
@@ -150,12 +148,12 @@ fn main() {
         let local_hosts_output = read_file_to_string(&local_hosts).unwrap();
         
         if Path::new(&local_hosts).exists() {
-            fs::write(&local_hosts, "");
+            fs::write(&local_hosts, "").unwrap();
         }
 
         let repos = read_file_to_string(&repos_file_location).unwrap();
         for repo in repos.lines() {
-            if repo == "" {
+            if repo.is_empty() {
                 continue;
             }
 

@@ -39,13 +39,16 @@ impl Colors {
     }
 }
 
+impl Default for Colors {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub fn check_no_color_env() -> bool {
     let no_color_env = env::var_os("NO_COLOR");
     
-    match no_color_env {
-        None => return false,
-        _ => {}
-    };
+    if no_color_env == None { return false }
 
     env::var_os("NO_COLOR").unwrap() == "1" || env::var_os("NO_COLOR").unwrap() == "true"
 }
