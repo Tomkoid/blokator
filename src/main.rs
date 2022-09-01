@@ -35,7 +35,7 @@ use crate::systemd::networkmanager::{
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
-use crate::repos::add_repo;
+use crate::repos::{add_repo, list_repos};
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -71,7 +71,11 @@ struct Args {
 
     /// Add repo for hosts files
     #[clap(long, value_parser, default_value = "none")]
-    add_repo: String
+    add_repo: String,
+
+    /// List all repos
+    #[clap(short, long, value_parser, default_value_t = false)]
+    list_repos: bool
 }
 
 #[derive(PartialEq, Eq)]
@@ -108,6 +112,14 @@ fn main() {
     // Initialize important directories
     if !already_initialized() {
         initialize_dir();
+    }
+
+    if args.list_repos {
+        let repos_list = list_repos();
+        for repo in repos_list {
+            println!("{}", repo);
+        }
+        exit(1);
     }
 
     if args.add_repo != "none" {

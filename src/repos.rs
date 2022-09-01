@@ -1,11 +1,13 @@
+use std::fmt::format;
 use std::process::exit;
+use std::path::Path;
 use crate::Colors;
 use crate::check_no_color_env;
 use crate::get_data_dir;
 use crate::read_file_to_string;
 use crate::write::write_to_file;
 
-pub fn verify_repo(repo: String) {
+fn verify_repo(repo: String) {
     let mut colors = Colors::new_without_colors();
 
     #[cfg(target_family = "unix")]
@@ -23,6 +25,29 @@ pub fn verify_repo(repo: String) {
         );
         exit(1)
     });
+}
+
+pub fn list_repos() -> Vec<String> {
+    let repos_file_location = format!(
+        "{}/repos",
+        get_data_dir()
+    );
+
+    let mut repos = "".to_string();
+    if Path::new(&repos_file_location).exists() {
+        repos = read_file_to_string(&repos_file_location).unwrap();
+    }
+
+    let mut repos_list: Vec<String> = [].to_vec();
+    for repo in repos.lines() {
+        if repo == "" {
+            continue;
+        }
+
+        repos_list.push(repo.to_string())
+    }
+
+    repos_list
 }
 
 pub fn add_repo(repo: String) {
