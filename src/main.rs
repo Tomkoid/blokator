@@ -4,19 +4,17 @@ use std::fs;
 use std::process::exit;
 use std::path::Path;
 
-#[cfg(target_os = "linux")]
-use nix::unistd::Uid;
-
 pub mod read;
 pub mod write;
 pub mod messages;
 pub mod colors;
 mod copy;
 mod sync;
-mod systemd;
+mod services;
 mod initialize_dirs;
 mod initialize_colors;
 mod repos;
+mod handle_permissions;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -28,14 +26,12 @@ use crate::windows::is_elevated;
 use crate::colors::{Colors, check_no_color_env};
 use crate::messages::{GenericMessages, HelpMessages};
 use crate::read::read_file_to_string;
-use crate::systemd::networkmanager::{ 
-                                    networkmanager_exists,
-                                    networkmanager_restart
-                                    };
+use crate::services::init::{ restart_networkmanager, exists_networkmanager };
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
+use crate::handle_permissions::handle_permissions;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -94,19 +90,9 @@ fn main() {
 
     let args = Args::parse();
 
-    // Check if the program is running with root permissions
-    #[cfg(target_family = "unix")]
-    if !Uid::effective().is_root() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
-        exit(1);
-    }
+    // Check if user is running blokator as root / administrator
+    handle_permissions();
 
-    #[cfg(target_family = "windows")]
-    if !is_elevated() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
-        exit(1);
-    }
-   
     // Initialize important directories
     if !already_initialized() {
         initialize_dir();
@@ -196,8 +182,8 @@ fn main() {
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
-        if networkmanager_exists() {
-            let networkmanager_status = match networkmanager_restart() {
+        if exists_networkmanager() {
+            let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
                 Err(e) => panic!("{}", e)
             };
@@ -240,8 +226,8 @@ fn main() {
         // Rewrite /etc/hosts
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
-        if networkmanager_exists() {
-            let networkmanager_status = match networkmanager_restart() {
+        if exists_networkmanager() {
+            let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
                 Err(e) => panic!("{}", e)
             };
