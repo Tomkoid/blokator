@@ -1,5 +1,5 @@
 pkgname="blokator"
-pkgver=0.1.3
+pkgver=0.2.1
 pkgrel=1
 pkgdesc="Simple system-wide adblocker"
 arch=("x86_64")

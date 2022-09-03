@@ -1,12 +1,8 @@
-#![feature(stmt_expr_attributes)]
-
 use clap::Parser;
 use dirs::home_dir;
+use std::fs;
 use std::process::exit;
 use std::path::Path;
-
-#[cfg(target_os = "linux")]
-use nix::unistd::Uid;
 
 pub mod read;
 pub mod write;
@@ -14,25 +10,28 @@ pub mod messages;
 pub mod colors;
 mod copy;
 mod sync;
-mod systemd;
+mod services;
 mod initialize_dirs;
+mod initialize_colors;
+mod repos;
+mod handle_permissions;
 
 #[cfg(target_family = "windows")]
 mod windows;
 
+use crate::initialize_colors::initialize_colors;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 
 use crate::colors::{Colors, check_no_color_env};
 use crate::messages::{GenericMessages, HelpMessages};
 use crate::read::read_file_to_string;
-use crate::systemd::networkmanager::{ 
-                                    networkmanager_exists,
-                                    networkmanager_restart
-                                    };
+use crate::services::init::{ restart_networkmanager, exists_networkmanager };
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
+use crate::repos::{add_repo, list_repos, del_repo};
+use crate::handle_permissions::handle_permissions;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -64,7 +63,19 @@ struct Args {
 
     /// Create a backup to /etc/hosts.backup
     #[clap(short, long, value_parser, default_value_t = false)]
-    backup: bool
+    backup: bool,
+
+    /// Add repo for hosts files
+    #[clap(short = 'm', long, value_parser, default_value = "none")]
+    add_repo: String,
+
+    /// List all repos
+    #[clap(short, long, value_parser, default_value_t = false)]
+    list_repos: bool,
+
+    /// Delete specified repo from the repo list
+    #[clap(short, long, value_parser, default_value = "none")]
+    del_repo: String
 }
 
 #[derive(PartialEq, Eq)]
@@ -75,40 +86,85 @@ pub enum Actions {
 }
 
 fn main() {
-    let mut colors = Colors::new_without_colors();
-
-    // If user runs blokator with NO_COLOR flag
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     let args = Args::parse();
 
-    // Check if the program is running with root permissions
-    #[cfg(target_family = "unix")]
-    if !Uid::effective().is_root() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
-        exit(1);
-    }
+    // Check if user is running blokator as root / administrator
+    handle_permissions();
 
-    #[cfg(target_family = "windows")]
-    if !is_elevated() {
-        println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
-        exit(1);
-    }
-   
     // Initialize important directories
     if !already_initialized() {
         initialize_dir();
     }
 
-    if args.sync {
-        if sync() {
-            println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.synced);
-        } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.synced_no_change)
+    if args.list_repos {
+        let repos_list = list_repos();
+        for repo in repos_list {
+            println!("{}", repo);
         }
+        exit(0);
+    }
+
+    if args.add_repo != "none" {
+        add_repo(args.add_repo);
+        exit(0);
+    }
+
+    if args.del_repo != "none" {
+        del_repo(args.del_repo);
+        exit(0);
+    }
+
+    if args.sync {
+        let repos_file_location = format!(
+            "{}/repos",
+            get_data_dir()
+        );
+
+        let local_hosts = format!(
+            "{}/hosts",
+            get_data_dir()
+        );
+
+        let local_hosts_output = read_file_to_string(&local_hosts).unwrap();
+        
+        if Path::new(&local_hosts).exists() {
+            fs::write(&local_hosts, "").unwrap();
+        }
+
+        let repos = read_file_to_string(&repos_file_location).unwrap();
+        for repo in repos.lines() {
+            if repo.is_empty() {
+                continue;
+            }
+
+            println!(
+                "{}==>{} Syncing {}..",
+                colors.bold_blue,
+                colors.reset,
+                repo,
+            );
+
+            sync(repo)
+        }
+
+        let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
+
+        if changed {
+            println!(
+                "{}==>{} Synced all repos successfully.",
+                colors.bold_green,
+                colors.reset
+            );
+        } else {
+            println!(
+                "{}==>{} Nothing changed.",
+                colors.bold_yellow,
+                colors.reset
+            );
+        }
+
         exit(0);
     }
 
@@ -126,8 +182,8 @@ fn main() {
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
-        if networkmanager_exists() {
-            let networkmanager_status = match networkmanager_restart() {
+        if exists_networkmanager() {
+            let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
                 Err(e) => panic!("{}", e)
             };
@@ -170,8 +226,8 @@ fn main() {
         // Rewrite /etc/hosts
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
-        if networkmanager_exists() {
-            let networkmanager_status = match networkmanager_restart() {
+        if exists_networkmanager() {
+            let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
                 Err(e) => panic!("{}", e)
             };
