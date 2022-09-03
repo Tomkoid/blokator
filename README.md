@@ -1,6 +1,7 @@
 # Blokator
 **Simple cross-platform and system-wide CLI adblocker**
-![Example](https://gitlab.com/Tomkoid/blokator/-/blob/readme/images/example.gif)
+
+<img src="images/example.gif">
 
 ## How it works
 First, Blokator fetches data from [StevenBlack hosts repo](https://github.com/StevenBlack/hosts) and stores it locally. After Blokator fetched the hosts file, it overwrites the system's **/etc/hosts** file. The hosts file redirects every ad URL / website to **0.0.0.0**, which should be empty.
