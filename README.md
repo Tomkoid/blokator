@@ -22,7 +22,7 @@ If you have another init system or networking service, you can restart it manual
 
 ## Installation
 ### Manual / Compilation
-Before we begin, make sure you have installed these things:
+Before you begin, make sure you have installed these things:
 - Rust
 - Cargo
 
