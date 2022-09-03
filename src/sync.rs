@@ -1,6 +1,6 @@
 use std::{process::exit, path::Path};
 
-use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, colors::{Colors, check_no_color_env}, initialize_colors::initialize_colors};
+use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, initialize_colors::initialize_colors};
 
 pub fn sync(repo: &str) {
     let colors = initialize_colors(); 

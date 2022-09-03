@@ -1,7 +1,6 @@
 use std::io::ErrorKind;
 use std::process::exit;
 
-use crate::colors::{Colors, check_no_color_env};
 use crate::initialize_colors::initialize_colors;
 use crate::{write::write_to_file, read::read_file_to_string, Actions};
 use crate::messages::CopyMessages;

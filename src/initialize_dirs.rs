@@ -4,7 +4,7 @@ use std::fs;
 
 use crate::initialize_colors::initialize_colors;
 use crate::write::write_to_file;
-use crate::{get_data_dir, colors::{check_no_color_env, Colors}};
+use crate::get_data_dir;
 
 pub fn already_initialized() -> bool {
     Path::new(&get_data_dir()).exists()

@@ -1,7 +1,7 @@
 use std::process::exit;
 use std::fs;
 
-use crate::{colors::{Colors, check_no_color_env}, initialize_colors::initialize_colors};
+use crate::initialize_colors::initialize_colors;
 
 pub fn write_to_file(path: &str, contents: String) {
     let colors = initialize_colors();
