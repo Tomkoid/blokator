@@ -2,6 +2,7 @@ use std::process::exit;
 use std::path::Path;
 use std::fs;
 
+use crate::initialize_colors::initialize_colors;
 use crate::write::write_to_file;
 use crate::{get_data_dir, colors::{check_no_color_env, Colors}};
 
@@ -10,12 +11,7 @@ pub fn already_initialized() -> bool {
 }
 
 pub fn initialize_dir() {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     fs::create_dir_all(get_data_dir()).unwrap_or_else(|e| {
         println!(

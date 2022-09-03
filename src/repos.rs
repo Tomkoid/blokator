@@ -3,16 +3,12 @@ use std::path::Path;
 use crate::Colors;
 use crate::check_no_color_env;
 use crate::get_data_dir;
+use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
 use crate::write::write_to_file;
 
 fn verify_repo(repo: String) {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     ureq::get(&repo).call().unwrap_or_else(|e| {
         println!(

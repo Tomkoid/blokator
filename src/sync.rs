@@ -1,14 +1,9 @@
 use std::{process::exit, path::Path};
 
-use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, colors::{Colors, check_no_color_env}};
+use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, colors::{Colors, check_no_color_env}, initialize_colors::initialize_colors};
 
 pub fn sync(repo: &str) {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors(); 
 
     let response = ureq::get(repo).call();
     

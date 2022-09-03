@@ -15,11 +15,13 @@ mod copy;
 mod sync;
 mod systemd;
 mod initialize_dirs;
+mod initialize_colors;
 mod repos;
 
 #[cfg(target_family = "windows")]
 mod windows;
 
+use crate::initialize_colors::initialize_colors;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 
@@ -88,13 +90,7 @@ pub enum Actions {
 }
 
 fn main() {
-    let mut colors = Colors::new_without_colors();
-
-    // If user runs blokator with NO_COLOR flag
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     let args = Args::parse();
 

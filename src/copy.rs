@@ -2,16 +2,12 @@ use std::io::ErrorKind;
 use std::process::exit;
 
 use crate::colors::{Colors, check_no_color_env};
+use crate::initialize_colors::initialize_colors;
 use crate::{write::write_to_file, read::read_file_to_string, Actions};
 use crate::messages::CopyMessages;
 
 pub fn copy(from: &str, to: &str, action: Actions) {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     let messages = CopyMessages::new(action);
 
