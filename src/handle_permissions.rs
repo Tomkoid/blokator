@@ -1,11 +1,13 @@
 use std::process::exit;
 use crate::initialize_colors;
-use crate::is_elevated;
 
 use crate::GenericMessages;
 
-#[cfg(target_os = "linux")]
+#[cfg(target_family = "unix")]
 use nix::unistd::Uid;
+
+#[cfg(target_family = "windows")]
+use crate::is_elevated;
 
 const MESSAGES: GenericMessages = GenericMessages::new();
 
