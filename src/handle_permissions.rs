@@ -1,5 +1,6 @@
 use std::process::exit;
 use crate::initialize_colors;
+use crate::is_elevated;
 
 use crate::GenericMessages;
 
