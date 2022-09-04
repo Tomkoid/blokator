@@ -17,6 +17,7 @@ Blokator can run basically everywhere. These are the tested platforms:
 - SystemD
 - Runit
 - OpenRC (restarting NetworkManager issue with OpenRC is in Known Issues category below)
+
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
