@@ -8,9 +8,9 @@ use crate::get_data_dir;
 
 pub fn already_initialized() -> bool {
     let mut status: bool = true;
-    if Path::new(&(get_data_dir() + "/hosts")).exists() { status = false };
-    if Path::new(&(get_data_dir() + "/repos")).exists() { status = false };
-    if Path::new(&get_data_dir()).exists() { status = false };
+    if !Path::new(&(get_data_dir() + "/hosts")).exists() { status = false };
+    if !Path::new(&(get_data_dir() + "/repos")).exists() { status = false };
+    if !Path::new(&get_data_dir()).exists() { status = false };
     status
 }
 
