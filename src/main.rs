@@ -1,7 +1,7 @@
-// main.py
+// main.rs
 //
-// Change the look of Adwaita, with ease
-// Copyright (C) 2022 Gradience Team
+// Simple cross-platform and system-wide CLI adblocker
+// Copyright (C) 2022 Tomáš Zierl
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
