@@ -28,7 +28,6 @@ use crate::write::write_to_file;
 fn verify_repo(repo: String) {
     let colors = initialize_colors();
 
-    println!("{:?}", repo);
     let client = reqwest::blocking::ClientBuilder::new().build().unwrap();
     client.get(repo).send().unwrap_or_else(|e| {
         println!(
