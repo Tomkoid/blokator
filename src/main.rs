@@ -65,7 +65,7 @@ const MESSAGES: GenericMessages = GenericMessages::new();
 const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
 #[derive(Parser, Debug)]
-#[clap(author = "Tomas Zierl", version, about, long_about = "Easy system-wide adblocker")]
+#[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
 struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]

@@ -17,13 +17,13 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use std::{process::exit, path::Path};
-
 use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, initialize_colors::initialize_colors};
 
 pub fn sync(repo: &str) {
     let colors = initialize_colors(); 
 
-    let response = ureq::get(repo).call();
+    let client = reqwest::blocking::ClientBuilder::new().build().unwrap();
+    let response = client.get(repo).send();
     
     let local_hosts = format!(
         "{}/hosts",
@@ -31,41 +31,39 @@ pub fn sync(repo: &str) {
     );
 
     let response = match response {
-        Ok(s) => s,
-        Err(e) => match e.kind() {
-            ureq::ErrorKind::Dns => {
+        Ok(s) => s.text().unwrap(),
+        Err(e) => {
+            if e.is_timeout() {
                 println!(
-                    "==> Connection failed. (Check your internet connection): {} (Kind: {})",
+                    "{}==>{} Connection failed. (Check your internet connection): {}",
+                    colors.bold_red,
+                    colors.reset,
                     e,
-                    e.kind()
                 );
                 exit(1)
-            },
-            _ => {
+            } else if e.is_connect() {
                 println!(
-                    "Error occurred: {} (Kind: {})",
+                    "{}==>{} Couldn't connect to the server. Please check your internet connection: {}",
+                    colors.bold_red,
+                    colors.reset,
+                    e
+                );
+                exit(1)
+            } else {
+                println!(
+                    "{}==>{} Error occurred: {}",
+                    colors.bold_red,
+                    colors.reset,
                     e,
-                    e.kind()
                 );
                 exit(1)
             }
         }
     };
 
-    let resp = response.into_string().unwrap_or_else(|e| {
-        println!(
-            "{}==>{} Error when converting response to String: {} (Kind: {})",
-            colors.bold_red,
-            colors.reset,
-            e,
-            e.kind()
-        );
-        exit(1)
-    });
-
     if Path::new(&local_hosts).exists() {
-        write_to_file(&local_hosts, read_file_to_string(&local_hosts).unwrap() + &resp + "\n\n");
+        write_to_file(&local_hosts, read_file_to_string(&local_hosts).unwrap() + &response + "\n\n");
     } else {
-        write_to_file(&local_hosts, resp);
+        write_to_file(&local_hosts, response);
     }
 }

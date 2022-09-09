@@ -28,13 +28,14 @@ use crate::write::write_to_file;
 fn verify_repo(repo: String) {
     let colors = initialize_colors();
 
-    ureq::get(&repo).call().unwrap_or_else(|e| {
+    println!("{:?}", repo);
+    let client = reqwest::blocking::ClientBuilder::new().build().unwrap();
+    client.get(repo).send().unwrap_or_else(|e| {
         println!(
-            "{}==>{} Failed to connect to the repo: {} (Kind: {})",
+            "{}==>{} Failed to connect to the repo: {}",
             colors.bold_red,
             colors.reset,
             e, 
-            e.kind()
         );
         exit(1)
     });
