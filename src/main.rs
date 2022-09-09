@@ -201,15 +201,21 @@ fn main() {
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         if exists_networkmanager() {
+            print!(
+                "{}==>{} Restarting NetworkManager..",
+                colors.bold_blue,
+                colors.reset
+            );
+
             let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("couldn't restart NetworkManager: {e}")
             };
 
             if networkmanager_status.success() {
-                println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart);
+                println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.networkmanager_couldnt_restart)
+                println!(" {}failed{}", colors.bold_red, colors.reset);
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
@@ -245,15 +251,21 @@ fn main() {
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
         if exists_networkmanager() {
+            print!(
+                "{}==>{} Restarting NetworkManager..",
+                colors.bold_blue,
+                colors.reset
+            );
+
             let networkmanager_status = match restart_networkmanager() {
                 Ok(s) => s,
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("couldn't restart NetworkManager: {e}")
             };
 
             if networkmanager_status.success() {
-                println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.networkmanager_restart);
+                println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.networkmanager_couldnt_restart);
+                println!(" {}failed{}", colors.bold_red, colors.reset);
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);

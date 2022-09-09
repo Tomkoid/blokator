@@ -14,9 +14,9 @@ panic = "abort"
 
 [dependencies]
 clap = { version = "3.2.17", default-features = false, features = ["std", "derive"] }
-dirs = "4.0.0"
-nix = "0.25.0"
-ureq = "2.5.0"
+dirs = { version = "4.0.0", default-features = false }
+nix = { version = "0.25.0" }
+ureq = { version = "2.5.0", default-features = false, features = ["tls"] }
 
 [target.'cfg(windows)'.dependencies]
 winapi = {version = "0.3.8", features = ["winuser", "handleapi", "processthreadsapi", "securitybaseapi"]}
