@@ -18,12 +18,19 @@
 
 use std::{process::exit, path::Path};
 use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, initialize_colors::initialize_colors};
+use crate::Args;
 
-pub fn sync(repo: &str) {
+pub fn sync(repo: &str, args: &Args) {
     let colors = initialize_colors(); 
 
-    let client = reqwest::blocking::ClientBuilder::new().build().unwrap();
-    let response = client.get(repo).send();
+    let mut client = reqwest::blocking::ClientBuilder::new();
+
+    let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
+    if args.tor {
+        client = client.proxy(reqwest::Proxy::http(tor_proxy).unwrap());
+    }
+
+    let response = client.build().unwrap().get(repo).send();
     
     let local_hosts = format!(
         "{}/hosts",

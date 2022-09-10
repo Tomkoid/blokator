@@ -24,12 +24,19 @@ use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
 use crate::write::write_to_file;
+use crate::Args;
 
-fn verify_repo(repo: String) {
+fn verify_repo(repo: &String, args: &Args) {
     let colors = initialize_colors();
 
-    let client = reqwest::blocking::ClientBuilder::new().build().unwrap();
-    client.get(repo).send().unwrap_or_else(|e| {
+    let mut client = reqwest::blocking::ClientBuilder::new();
+
+    let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
+    if args.tor {
+        client = client.proxy(reqwest::Proxy::http(tor_proxy).unwrap())
+    }
+
+    client.build().unwrap().get(repo).send().unwrap_or_else(|e| {
         println!(
             "{}==>{} Failed to connect to the repo: {}",
             colors.bold_red,
@@ -63,7 +70,7 @@ pub fn list_repos() -> Vec<String> {
     repos_list
 }
 
-pub fn add_repo(repo: String) {
+pub fn add_repo(repo: &String, args: &Args) {
     let mut colors = Colors::new_without_colors();
 
     #[cfg(target_family = "unix")]
@@ -88,7 +95,7 @@ pub fn add_repo(repo: String) {
     output = format!("{}\n{}", output, repo);
 
     // Check if the repo responds
-    verify_repo(repo);
+    verify_repo(&repo, &args);
 
     write_to_file(&file_location, output);
 

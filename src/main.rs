@@ -66,7 +66,7 @@ const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
 #[derive(Parser, Debug)]
 #[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
-struct Args {
+pub struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
     apply: bool,
@@ -93,7 +93,20 @@ struct Args {
 
     /// Delete specified repo from the repo list
     #[clap(short, long, value_parser, default_value = "none")]
-    del_repo: String
+    del_repo: String,
+
+    /// Use TOR proxy for making requests
+    #[clap(short, long, value_parser, default_value_t = false)]
+    tor: bool,
+
+    /// Change TOR bind address
+    #[clap(long, value_parser, default_value = "127.0.0.1")]
+    tor_bind_address: String,
+
+    /// Change TOR port
+    #[clap(long, value_parser, default_value_t = 9050)]
+    tor_port: i32,
+
 }
 
 #[derive(PartialEq, Eq)]
@@ -125,7 +138,7 @@ fn main() {
     }
 
     if args.add_repo != "none" {
-        add_repo(args.add_repo);
+        add_repo(&args.add_repo, &args);
         exit(0);
     }
 
@@ -164,7 +177,7 @@ fn main() {
                 repo,
             );
 
-            sync(repo)
+            sync(repo, &args)
         }
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
