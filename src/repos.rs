@@ -129,7 +129,7 @@ pub fn del_repo(repo: String) {
             );
             exit(1);
         }
-        repos = repos.replace(&repo, "").replace("\n\n", "");
+        repos = repos.replace(&repo, "").replace("\n\n", "\n");
         write_to_file(&repos_file_location, repos);
         println!(
             "{}==>{} Deleted {} from the repo list.",
