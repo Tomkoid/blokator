@@ -33,6 +33,7 @@ mod initialize_dirs;
 mod initialize_colors;
 mod repos;
 mod handle_permissions;
+mod allowed_exit_functions;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -50,6 +51,7 @@ use crate::sync::sync;
 use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
+use crate::allowed_exit_functions::check_allowed_function;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -196,7 +198,6 @@ fn main() {
             );
         }
 
-        exit(0);
     }
 
     // Create backup to /etc/hosts.backup
@@ -287,6 +288,9 @@ fn main() {
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
         exit(0);
     }
+
+    // Check if allowed exit functions ended (else exit)
+    check_allowed_function(&args);
 
     println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
     println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);

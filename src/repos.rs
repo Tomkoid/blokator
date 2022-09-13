@@ -95,7 +95,7 @@ pub fn add_repo(repo: &String, args: &Args) {
     output = format!("{}\n{}", output, repo);
 
     // Check if the repo responds
-    verify_repo(&repo, &args);
+    verify_repo(repo, args);
 
     write_to_file(&file_location, output);
 
