@@ -53,6 +53,7 @@ use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
 use crate::allowed_exit_functions::check_allowed_function;
+use crate::services::init::get_init;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -241,7 +242,16 @@ fn main() {
             if networkmanager_status.success() {
                 println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!(" {}failed{}", colors.bold_red, colors.reset);
+                // Init 2 = OpenRC
+                /*
+                 * OpenRC returns 1 as a exit code when printing errors and
+                 * warning, which is the same exit code
+                 */
+                if get_init() == 2 {
+                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
+                } else {
+                    println!(" {}failed{}", colors.bold_red, colors.reset);
+                }
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
@@ -291,7 +301,16 @@ fn main() {
             if networkmanager_status.success() {
                 println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!(" {}failed{}", colors.bold_red, colors.reset);
+                // Init 2 = OpenRC
+                /*
+                 * OpenRC returns 1 as a exit code when printing errors and
+                 * warning, which is the same exit code
+                 */
+                if get_init() == 2 {
+                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
+                } else {
+                    println!(" {}failed{}", colors.bold_red, colors.reset);
+                }
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);

@@ -21,7 +21,7 @@ Blokator can run basically everywhere. These are the tested platforms:
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
-- In OpenRC restarting NetworkManager.service causes error when the output is warning.
+- Colors don't work in Windows
 
 ## Usage
 After you installed Blokator, you need to sync the hosts files. To sync the hosts files, run Blokator with **--sync** argument:
