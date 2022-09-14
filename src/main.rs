@@ -21,6 +21,7 @@ use dirs::home_dir;
 use std::fs;
 use std::process::exit;
 use std::path::Path;
+use std::io::Write;
 
 pub mod read;
 pub mod write;
@@ -172,14 +173,25 @@ fn main() {
                 continue;
             }
 
-            println!(
-                "{}==>{} Syncing {}..",
+            print!(
+                "{}==>{} Syncing {}.. ",
                 colors.bold_blue,
                 colors.reset,
                 repo,
             );
 
-            sync(repo, &args)
+            std::io::stdout().flush().unwrap();
+
+            let time = std::time::SystemTime::now();
+
+            sync(repo, &args);
+
+            println!(
+                "{}took {}ms{}",
+                colors.bold_green,
+                time.elapsed().expect("counting elapsed time").as_millis(),
+                colors.reset
+            )
         }
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
