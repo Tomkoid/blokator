@@ -27,7 +27,7 @@ pub fn sync(repo: &str, args: &Args) {
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
     if args.tor {
-        client = client.proxy(reqwest::Proxy::http(tor_proxy).unwrap());
+        client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
     let response = client.build().unwrap().get(repo).send();

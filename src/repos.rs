@@ -33,7 +33,7 @@ fn verify_repo(repo: &String, args: &Args) {
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
     if args.tor {
-        client = client.proxy(reqwest::Proxy::http(tor_proxy).unwrap())
+        client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
     }
 
     client.build().unwrap().get(repo).send().unwrap_or_else(|e| {
