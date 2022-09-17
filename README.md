@@ -4,7 +4,7 @@
 [![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
 
 ## How it works
-First, Blokator fetches data from [StevenBlack hosts repo](https://github.com/StevenBlack/hosts) and stores it locally. After Blokator fetched the hosts file, it overwrites the system's **/etc/hosts** file. The hosts file redirects every ad URL / website to **0.0.0.0**, which should be empty.
+Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresses, which acts like local DNS server.
 
 ## Features
 - Apply
