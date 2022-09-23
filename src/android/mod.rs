@@ -1,4 +1,4 @@
-// services/openrc.rs
+// android/mod.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
@@ -16,11 +16,5 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-
-use std::process::Command;
-
-pub fn networkmanager_openrc_restart() -> Result<std::process::ExitStatus, std::io::Error> {
-    Command::new("rc-service")
-        .args(["NetworkManager", "restart"])
-        .status()
-}
+pub mod apply;
+pub mod checks;

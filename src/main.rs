@@ -35,6 +35,7 @@ mod initialize_colors;
 mod repos;
 mod handle_permissions;
 mod allowed_exit_functions;
+mod android;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -54,6 +55,7 @@ use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
 use crate::allowed_exit_functions::check_allowed_function;
 use crate::services::init::get_init;
+use crate::android::apply::apply_android;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -74,6 +76,10 @@ pub struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
     apply: bool,
+
+    /// Start adblocker on your Android phone with ADB (experimental, root required)
+    #[clap(long, value_parser, default_value_t = false)]
+    apply_android: bool,
 
     /// Sync the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
@@ -320,6 +326,16 @@ fn main() {
         }
 
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
+        exit(0);
+    }
+
+    if args.apply_android {
+        apply_android();
+        println!(
+            "{}==>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
+            colors.bold_green,
+            colors.reset
+        );
         exit(0);
     }
 
