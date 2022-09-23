@@ -11,6 +11,4 @@ archlinux-pkgbuild/src
 archlinux-pkgbuild/target
 archlinux-pkgbuild/pkg
 archlinux-pkgbuild/blokator
-
-# Copy files to AUR repo
-archlinux-pkgbuild/update-aur.sh
+archlinux-pkgbuild/blokator-aur
