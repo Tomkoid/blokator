@@ -41,6 +41,7 @@ pub fn apply_android() {
         }
     }
 
+    // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
         .args(["shell", "su", "-c", "mount", "-o", "rw,remount", "/"])
         .stdout(Stdio::piped())
@@ -56,6 +57,7 @@ pub fn apply_android() {
         exit(1);
     }
 
+    // Push temporary hosts file to /sdcard/hosts
     let push_sdcard = Command::new("adb")
         .stdout(Stdio::piped())
         .args(["push", &(get_data_dir() + "/hosts"), "/sdcard/hosts"])
@@ -71,6 +73,7 @@ pub fn apply_android() {
         exit(1);
     }
 
+    // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
         .stdout(Stdio::piped())
         .args(["shell", "su", "-c", "'cp", "/etc/hosts", "/etc/hosts.backup'"])
@@ -86,6 +89,7 @@ pub fn apply_android() {
         exit(1);
     }
 
+    // Apply / Move hosts file
     let move_to_etc_hosts = Command::new("adb")
         .stdout(Stdio::piped())
         .args(["shell", "su", "-c", "'mv", "/sdcard/hosts", "/etc/hosts'"])
@@ -101,6 +105,7 @@ pub fn apply_android() {
         exit(1);
     }
 
+    // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
         .args(["shell", "su", "-c", "mount", "-o", "ro,remount", "/"])
         .stdout(Stdio::piped())
