@@ -33,7 +33,6 @@ pub fn device_ready() -> bool {
 
     let mut index = 0;
     for line in devices_output.lines() {
-        println!("{}{}", line, index);
         if index == 1 && line.contains("device") { return true; }
         index += 1;
     }
