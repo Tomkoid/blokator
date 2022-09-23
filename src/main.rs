@@ -175,7 +175,7 @@ fn main() {
             }
 
             print!(
-                "{}==>{} Syncing {}.. ",
+                "  [{}*{}] Syncing {}.. ",
                 colors.bold_blue,
                 colors.reset,
                 repo,
