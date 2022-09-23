@@ -21,6 +21,12 @@ use dirs::home_dir;
 use std::fs;
 use std::process::exit;
 use std::path::Path;
+<<<<<<< Updated upstream
+=======
+use std::io::Write;
+use std::thread;
+use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
+>>>>>>> Stashed changes
 
 pub mod read;
 pub mod write;
@@ -117,6 +123,43 @@ pub enum Actions {
 }
 
 fn main() {
+    // Signal handling (ex: CTRL + c)
+    #[cfg(target_os = "linux")]
+    let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
+   
+    #[cfg(target_os = "linux")]
+    thread::spawn(move || {
+        for sig in signals.forever() {
+            match sig {
+                2 => {
+                    println!(
+                        " {}Exiting..{}",
+                        initialize_colors().bold_red,
+                        initialize_colors().reset
+                    );
+                    exit(0);
+                }
+                15 => {
+                    println!(
+                        " {}Exiting..{}",
+                        initialize_colors().bold_red,
+                        initialize_colors().reset
+                    );
+                    exit(1);
+                }
+                _ => {
+                    println!(
+                        " {}Exiting..{}",
+                        initialize_colors().bold_red,
+                        initialize_colors().reset
+                    );
+                    exit(1);
+                }
+            }
+        }
+    });
+
+    // Initialize colors
     let colors = initialize_colors();
 
     let args = Args::parse();
