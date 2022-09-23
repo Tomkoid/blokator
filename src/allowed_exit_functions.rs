@@ -1,4 +1,4 @@
-// services/openrc.rs
+// allowed_exit_functions.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
@@ -16,11 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use std::process::exit;
+use crate::Args;
 
-use std::process::Command;
-
-pub fn networkmanager_openrc_restart() -> Result<std::process::ExitStatus, std::io::Error> {
-    Command::new("rc-service")
-        .args(["NetworkManager", "restart"])
-        .status()
+pub fn check_allowed_function(args: &Args) {
+    if args.sync {
+        exit(1)
+    }
 }

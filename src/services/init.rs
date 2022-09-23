@@ -1,4 +1,4 @@
-// init.rs
+// services/init.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
@@ -31,7 +31,7 @@ const NETWORKMANAGER_OPENRC_SERVICE_PATH: &str = "/etc/runlevels/default/Network
  * 1 - runit
  * 2 - openrc
 */
-fn get_init() -> i32 {
+pub fn get_init() -> i32 {
     if Path::new(NETWORKMANAGER_SYSTEMD_SERVICE_PATH).exists() {
         return 0;
     } else if Path::new(NETWORKMANAGER_RUNIT_SERVICE_PATH).exists() {

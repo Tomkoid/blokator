@@ -1,10 +1,21 @@
 # Blokator
 **Simple cross-platform and system-wide CLI adblocker**
 
-<img src="images/example.gif">
+[![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
 
 ## How it works
-First, Blokator fetches data from [StevenBlack hosts repo](https://github.com/StevenBlack/hosts) and stores it locally. After Blokator fetched the hosts file, it overwrites the system's **/etc/hosts** file. The hosts file redirects every ad URL / website to **0.0.0.0**, which should be empty.
+Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresses, which acts like local DNS server.
+
+## Features
+- Apply
+- Revert
+- Create a backup of current hosts file
+- Restore backup
+- Sync
+- Add custom repos
+- Delete custom repos
+- Access custom repos with TOR
+- Apply for Android device (experimental, root required)
 
 ## Compatibility
 Blokator can run basically everywhere. These are the tested platforms:
@@ -21,7 +32,7 @@ Blokator can run basically everywhere. These are the tested platforms:
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
-- In OpenRC restarting NetworkManager.service causes error when the output is warning.
+- Colors don't work in Windows
 
 ## Usage
 After you installed Blokator, you need to sync the hosts files. To sync the hosts files, run Blokator with **--sync** argument:

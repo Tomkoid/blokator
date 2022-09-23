@@ -21,12 +21,9 @@ use dirs::home_dir;
 use std::fs;
 use std::process::exit;
 use std::path::Path;
-<<<<<<< Updated upstream
-=======
 use std::io::Write;
 use std::thread;
 use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
->>>>>>> Stashed changes
 
 pub mod read;
 pub mod write;
@@ -39,6 +36,8 @@ mod initialize_dirs;
 mod initialize_colors;
 mod repos;
 mod handle_permissions;
+mod allowed_exit_functions;
+mod android;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -56,6 +55,9 @@ use crate::sync::sync;
 use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
+use crate::allowed_exit_functions::check_allowed_function;
+use crate::services::init::get_init;
+use crate::android::apply::apply_android;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -76,6 +78,10 @@ pub struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
     apply: bool,
+
+    /// Start adblocker on your Android phone with ADB (experimental, root required)
+    #[clap(long, value_parser, default_value_t = false)]
+    apply_android: bool,
 
     /// Sync the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
@@ -162,7 +168,7 @@ fn main() {
     // Initialize colors
     let colors = initialize_colors();
 
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     // Check if user is running blokator as root / administrator
     handle_permissions();
@@ -213,33 +219,46 @@ fn main() {
                 continue;
             }
 
-            println!(
-                "{}==>{} Syncing {}..",
+            print!(
+                "  [{}*{}] Syncing {}.. ",
                 colors.bold_blue,
                 colors.reset,
                 repo,
             );
 
-            sync(repo, &args)
+            std::io::stdout().flush().unwrap();
+
+            let time = std::time::SystemTime::now();
+
+            sync(repo, &args);
+
+            println!(
+                "{}took {}ms{}",
+                colors.bold_green,
+                time.elapsed().expect("counting elapsed time").as_millis(),
+                colors.reset
+            )
         }
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
 
-        if changed {
-            println!(
-                "{}==>{} Synced all repos successfully.",
-                colors.bold_green,
-                colors.reset
-            );
-        } else {
-            println!(
-                "{}==>{} Nothing changed.",
-                colors.bold_yellow,
-                colors.reset
-            );
-        }
+        if !changed { args.apply = false }
 
-        exit(0);
+        if !args.apply {
+            if changed {
+                println!(
+                    "  [{}+{}] Synced all repos successfully.",
+                    colors.bold_green,
+                    colors.reset
+                );
+            } else {
+                println!(
+                    "  [{}-{}] Nothing changed.",
+                    colors.bold_yellow,
+                    colors.reset
+                );
+            }
+         }
     }
 
     // Create backup to /etc/hosts.backup
@@ -271,7 +290,16 @@ fn main() {
             if networkmanager_status.success() {
                 println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!(" {}failed{}", colors.bold_red, colors.reset);
+                // Init 2 = OpenRC
+                /*
+                 * OpenRC returns 1 as a exit code when printing errors and
+                 * warning, which is the same exit code
+                 */
+                if get_init() == 2 {
+                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
+                } else {
+                    println!(" {}failed{}", colors.bold_red, colors.reset);
+                }
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
@@ -321,7 +349,16 @@ fn main() {
             if networkmanager_status.success() {
                 println!(" {}done{}", colors.bold_green, colors.reset);
             } else {
-                println!(" {}failed{}", colors.bold_red, colors.reset);
+                // Init 2 = OpenRC
+                /*
+                 * OpenRC returns 1 as a exit code when printing errors and
+                 * warning, which is the same exit code
+                 */
+                if get_init() == 2 {
+                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
+                } else {
+                    println!(" {}failed{}", colors.bold_red, colors.reset);
+                }
             }
         } else {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
@@ -330,6 +367,19 @@ fn main() {
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
         exit(0);
     }
+
+    if args.apply_android {
+        apply_android();
+        println!(
+            "{}==>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
+            colors.bold_green,
+            colors.reset
+        );
+        exit(0);
+    }
+
+    // Check if allowed exit functions ended (else exit)
+    check_allowed_function(&args);
 
     println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
     println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);

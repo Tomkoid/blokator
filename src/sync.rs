@@ -27,7 +27,7 @@ pub fn sync(repo: &str, args: &Args) {
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
     if args.tor {
-        client = client.proxy(reqwest::Proxy::http(tor_proxy).unwrap());
+        client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
     let response = client.build().unwrap().get(repo).send();
@@ -42,7 +42,7 @@ pub fn sync(repo: &str, args: &Args) {
         Err(e) => {
             if e.is_timeout() {
                 println!(
-                    "{}==>{} Connection failed. (Check your internet connection): {}",
+                    "\n{}==>{} Connection failed. (Check your internet connection): {}",
                     colors.bold_red,
                     colors.reset,
                     e,
@@ -50,7 +50,7 @@ pub fn sync(repo: &str, args: &Args) {
                 exit(1)
             } else if e.is_connect() {
                 println!(
-                    "{}==>{} Couldn't connect to the server. Please check your internet connection: {}",
+                    "\n{}==>{} Couldn't connect to the server. Please check your internet connection: {}",
                     colors.bold_red,
                     colors.reset,
                     e
@@ -58,7 +58,7 @@ pub fn sync(repo: &str, args: &Args) {
                 exit(1)
             } else {
                 println!(
-                    "{}==>{} Error occurred: {}",
+                    "\n{}==>{} Error occurred: {}",
                     colors.bold_red,
                     colors.reset,
                     e,
