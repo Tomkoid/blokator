@@ -123,7 +123,7 @@ pub enum Actions {
 fn main() {
     let colors = initialize_colors();
 
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     // Check if user is running blokator as root / administrator
     handle_permissions();
@@ -197,20 +197,23 @@ fn main() {
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
 
-        if changed {
-            println!(
-                "{}==>{} Synced all repos successfully.",
-                colors.bold_green,
-                colors.reset
-            );
-        } else {
-            println!(
-                "{}==>{} Nothing changed.",
-                colors.bold_yellow,
-                colors.reset
-            );
-        }
+        if !changed { args.apply = false }
 
+        if !args.apply {
+            if changed {
+                println!(
+                    "  [{}+{}] Synced all repos successfully.",
+                    colors.bold_green,
+                    colors.reset
+                );
+            } else {
+                println!(
+                    "  [{}-{}] Nothing changed.",
+                    colors.bold_yellow,
+                    colors.reset
+                );
+            }
+         }
     }
 
     // Create backup to /etc/hosts.backup
