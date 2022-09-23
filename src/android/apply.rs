@@ -41,6 +41,21 @@ pub fn apply_android() {
         }
     }
 
+    let mount_system_as_rw = Command::new("adb")
+        .args(["shell", "su", "-c", "mount", "-o", "rw,remount", "/"])
+        .stdout(Stdio::piped())
+        .status()
+        .unwrap();
+
+    if !mount_system_as_rw.success() {
+        println!(
+            "{}==>{} Failed to mount the system as read & write",
+            colors.bold_red,
+            colors.reset
+        );
+        exit(1);
+    }
+
     let push_sdcard = Command::new("adb")
         .stdout(Stdio::piped())
         .args(["push", &(get_data_dir() + "/hosts"), "/sdcard/hosts"])
@@ -86,4 +101,17 @@ pub fn apply_android() {
         exit(1);
     }
 
+    let mount_system_as_ro = Command::new("adb")
+        .args(["shell", "su", "-c", "mount", "-o", "ro,remount", "/"])
+        .stdout(Stdio::piped())
+        .status()
+        .unwrap();
+
+    if !mount_system_as_ro.success() {
+        println!(
+            "{}==>{} Failed to mount the system as read only",
+            colors.bold_yellow,
+            colors.reset
+        );
+    }
 }
