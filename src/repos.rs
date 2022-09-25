@@ -18,8 +18,6 @@
 
 use std::process::exit;
 use std::path::Path;
-use crate::Colors;
-use crate::check_no_color_env;
 use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
@@ -71,12 +69,7 @@ pub fn list_repos() -> Vec<String> {
 }
 
 pub fn add_repo(repo: &String, args: &Args) {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     let file_location = format!("{}/repos", get_data_dir());
     let mut output = read_file_to_string(&file_location).unwrap();
@@ -107,12 +100,7 @@ pub fn add_repo(repo: &String, args: &Args) {
 }
 
 pub fn del_repo(repo: String) {
-    let mut colors = Colors::new_without_colors();
-
-    #[cfg(target_family = "unix")]
-    if !check_no_color_env() {
-        colors = Colors::new();
-    }
+    let colors = initialize_colors();
 
     let repos_file_location = format!(
         "{}/repos",

@@ -22,8 +22,12 @@ use std::fs;
 use std::process::exit;
 use std::path::Path;
 use std::io::Write;
-use std::thread;
+
+#[cfg(target_os = "linux")]
 use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
+
+#[cfg(target_os = "linux")]
+use std::thread;
 
 pub mod read;
 pub mod write;
@@ -46,7 +50,7 @@ use crate::initialize_colors::initialize_colors;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 
-use crate::colors::{Colors, check_no_color_env};
+use crate::colors::Colors;
 use crate::messages::{GenericMessages, HelpMessages};
 use crate::read::read_file_to_string;
 use crate::services::init::{ restart_networkmanager, exists_networkmanager };
