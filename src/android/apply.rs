@@ -33,7 +33,7 @@ pub fn apply_android() {
         true => {},
         false => {
             println!(
-                "{}==>{} Device is not ready.",
+                "{}error:{} Device is not ready.",
                 colors.bold_red,
                 colors.reset
             );
@@ -50,7 +50,7 @@ pub fn apply_android() {
 
     if !mount_system_as_rw.success() {
         println!(
-            "{}==>{} Failed to mount the system as read & write",
+            "{}error:{} Failed to mount the system as read & write",
             colors.bold_red,
             colors.reset
         );
@@ -66,7 +66,7 @@ pub fn apply_android() {
 
     if !push_sdcard.success() {
         println!(
-            "{}==>{} Cannot push the hosts file to the Android device",
+            "{}error:{} Cannot push the hosts file to the Android device",
             colors.bold_red,
             colors.reset
         );
@@ -82,7 +82,7 @@ pub fn apply_android() {
 
     if !copy_etc_hosts.success() {
         println!(
-            "{}==>{} Cannot make a backup of the hosts file",
+            "{}error:{} Cannot make a backup of the hosts file",
             colors.bold_red,
             colors.reset
         );
@@ -98,7 +98,7 @@ pub fn apply_android() {
 
     if !move_to_etc_hosts.success() {
         println!(
-            "{}==>{} Cannot apply the hosts file",
+            "{}error:{} Cannot apply the hosts file",
             colors.bold_red,
             colors.reset
         );
@@ -114,7 +114,7 @@ pub fn apply_android() {
 
     if !mount_system_as_ro.success() {
         println!(
-            "{}==>{} Failed to mount the system as read only",
+            "{}error:{} Failed to mount the system as read only",
             colors.bold_yellow,
             colors.reset
         );

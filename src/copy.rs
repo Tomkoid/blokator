@@ -33,7 +33,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
         Err(e) => match e.kind() {
             ErrorKind::NotFound => {
                 println!(
-                    "{}==>{} {}: {} (Kind: {})",
+                    "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
                     messages.not_found,
@@ -44,7 +44,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
             }
             ErrorKind::PermissionDenied => {
                 println!(
-                    "{}==>{} {}: {} (Kind: {})",
+                    "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
                     messages.permission_denied,
@@ -55,7 +55,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
             }
             _ => {
                 println!(
-                    "{}==>{} {}: {} (Kind: {})",
+                    "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
                     messages.unknown_error,

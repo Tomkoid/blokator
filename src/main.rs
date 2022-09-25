@@ -172,7 +172,7 @@ fn main() {
     // Initialize colors
     let colors = initialize_colors();
 
-    let mut args = Args::parse();
+    let args = Args::parse();
 
     // Check if user is running blokator as root / administrator
     handle_permissions();
@@ -246,23 +246,19 @@ fn main() {
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
 
-        if !changed { args.apply = false }
-
-        if !args.apply {
-            if changed {
-                println!(
-                    "  [{}+{}] Synced all repos successfully.",
-                    colors.bold_green,
-                    colors.reset
-                );
-            } else {
-                println!(
-                    "  [{}-{}] Nothing changed.",
-                    colors.bold_yellow,
-                    colors.reset
-                );
-            }
-         }
+        if changed {
+            println!(
+                "  [{}+{}] Synced all repos successfully.",
+                colors.bold_green,
+                colors.reset
+            );
+        } else {
+            println!(
+                "  [{}-{}] Nothing changed.",
+                colors.bold_yellow,
+                colors.reset
+            );
+        }
     }
 
     // Create backup to /etc/hosts.backup
@@ -318,15 +314,15 @@ fn main() {
             get_data_dir()
         );
         if !Path::new(&local_hosts).exists() {
-            println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.local_hosts_missing);
-            println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.local_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.local_hosts_missing);
+            println!("  {}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.local_hosts_missing);
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.etc_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.etc_hosts_missing);
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.already_applied);
+            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, MESSAGES.already_applied);
             exit(1);
         }
                
@@ -340,7 +336,7 @@ fn main() {
         
         if exists_networkmanager() {
             print!(
-                "{}==>{} Restarting NetworkManager..",
+                "   {}>{} Restarting NetworkManager..",
                 colors.bold_blue,
                 colors.reset
             );
@@ -365,17 +361,17 @@ fn main() {
                 }
             }
         } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
+            println!("   {}>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
         }
 
-        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
+        println!("   {}>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
         exit(0);
     }
 
     if args.apply_android {
         apply_android();
         println!(
-            "{}==>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
+            "   {}>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
             colors.bold_green,
             colors.reset
         );
@@ -385,8 +381,8 @@ fn main() {
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
 
-    println!("{}==>{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
-    println!("{}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);
+    println!("{}error:{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
+    println!("{}HELP:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);
     exit(1);
 }
 

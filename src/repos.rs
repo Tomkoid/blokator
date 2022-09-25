@@ -36,7 +36,7 @@ fn verify_repo(repo: &String, args: &Args) {
 
     client.build().unwrap().get(repo).send().unwrap_or_else(|e| {
         println!(
-            "{}==>{} Failed to connect to the repo: {}",
+            "{}error:{} Failed to connect to the repo: {}",
             colors.bold_red,
             colors.reset,
             e, 
@@ -77,7 +77,7 @@ pub fn add_repo(repo: &String, args: &Args) {
     for i in output.lines() {
         if i == repo {
             println!(
-                "{}==>{} The repo you're trying to add already exists in repos list.",
+                "{}error:{} The repo you're trying to add already exists in repos list.",
                 colors.bold_red,
                 colors.reset
             );
@@ -93,7 +93,7 @@ pub fn add_repo(repo: &String, args: &Args) {
     write_to_file(&file_location, output);
 
     println!(
-        "{}==>{} Added and verified the repo.",
+        "{}success:{} Added and verified the repo.",
         colors.bold_green,
         colors.reset
     );
@@ -111,7 +111,7 @@ pub fn del_repo(repo: String) {
         let mut repos = read_file_to_string(&repos_file_location).unwrap();
         if !repos.contains(&repo) {
             println!(
-                "{}==>{} The repo you're trying to delete doesn't exist",
+                "{}error:{} The repo you're trying to delete doesn't exist",
                 colors.bold_red,
                 colors.reset
             );
@@ -120,14 +120,14 @@ pub fn del_repo(repo: String) {
         repos = repos.replace(&repo, "").replace("\n\n", "\n");
         write_to_file(&repos_file_location, repos);
         println!(
-            "{}==>{} Deleted {} from the repo list.",
+            "{}success:{} Deleted {} from the repo list.",
             colors.bold_green,
             colors.reset,
             repo
         );
     } else {
         println!(
-            "{}==>{} Failed to delete {} from the repo list, because the repo list doesn't exist.",
+            "{}error:{} Failed to delete {} from the repo list, because the repo list doesn't exist.",
             colors.bold_red,
             colors.reset,
             repo

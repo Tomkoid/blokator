@@ -26,7 +26,7 @@ pub fn write_to_file(path: &str, contents: String) {
 
     fs::write(path, contents).unwrap_or_else(|e| {
         println!(
-            "{}==>{} Error occurred when writing to {}: {} (Kind: {})",
+            "{}error:{} Error occurred when writing to {}: {} (Kind: {})",
             colors.bold_red,
             colors.reset,
             path,

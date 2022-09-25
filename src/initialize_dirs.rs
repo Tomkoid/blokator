@@ -37,7 +37,7 @@ pub fn initialize_dir() {
 
     fs::create_dir_all(get_data_dir()).unwrap_or_else(|e| {
         println!(
-            "{}==>{} Error occurred when initializing dirs: {} (Kind: {})",
+            "{}error:{} Error occurred when initializing dirs: {} (Kind: {})",
             colors.bold_red,
             colors.reset,
             e,
