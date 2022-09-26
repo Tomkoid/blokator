@@ -38,7 +38,18 @@ pub fn sync(repo: &str, args: &Args) {
     );
 
     let response = match response {
-        Ok(s) => s.text().unwrap(),
+        Ok(s) => match s.text() {
+            Ok(resp) => resp,
+            Err(e) => {
+                println!(
+                    "\n{}error:{} Failed to decode response: {}",
+                    colors.bold_red,
+                    colors.reset,
+                    e
+                );
+                exit(1);
+            }
+        }
         Err(e) => {
             if e.is_timeout() {
                 println!(
