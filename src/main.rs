@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#![allow(unreachable_code)]
+
 use clap::Parser;
 use dirs::home_dir;
 use std::fs;
@@ -369,6 +371,16 @@ fn main() {
     }
 
     if args.apply_android {
+        #[cfg(not(feature = "android"))]
+        {
+            println!(
+                "   {}>{} To use this feature, you need to compile Blokator with `android` feature.",
+                colors.bold_red,
+                colors.reset
+            );
+            exit(1);
+        }
+
         apply_android();
         println!(
             "   {}>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",

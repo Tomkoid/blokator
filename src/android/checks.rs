@@ -31,12 +31,10 @@ pub fn device_ready() -> bool {
 
     let devices_output = String::from_utf8(devices.stdout).unwrap();
 
-    let mut index = 0;
-    for line in devices_output.lines() {
+    for (index, line) in devices_output.lines().enumerate() {
         if index == 1 && line.contains("device") { return true; }
-        index += 1;
     }
-    
+
     false
 }
 
