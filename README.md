@@ -71,6 +71,13 @@ Before you begin, make sure you have installed these things:
 - Rust
 - Cargo
 
+#### With Cargo
+You can install **Blokator** easily with Cargo package manager:
+```
+cargo install blokator
+```
+
+#### With Git
 First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to your local machine:
 
 ```
