@@ -3,6 +3,13 @@
 # USAGE:
 # ./update-aur.sh <version>
 
+if [ "$1" == "" ]
+then
+  echo "error: Not enough arguments."
+  echo "usage: ./update-aur.sh <to>"
+  exit
+fi
+
 CD_DIR="$PWD"
 
 REPO_URL="ssh://aur@aur.archlinux.org/blokator.git"
