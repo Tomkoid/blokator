@@ -24,6 +24,7 @@ use std::fs;
 use std::process::exit;
 use std::path::Path;
 use std::io::Write;
+use std::sync::{ Arc, Mutex };
 
 #[cfg(target_os = "linux")]
 use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
@@ -135,39 +136,39 @@ pub enum Actions {
 }
 
 fn main() {
+    // This will be true if some action is running
+    let mut state = Arc::new(Mutex::new(false));
+
     // Signal handling (ex: CTRL + c)
     #[cfg(target_os = "linux")]
     let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
    
     #[cfg(target_os = "linux")]
+    let thread_state = Arc::clone(&state);
+
+    #[cfg(target_os = "linux")]
     thread::spawn(move || {
-        for sig in signals.forever() {
-            match sig {
-                2 => {
+        let mut already_pressed = false;
+        for _ in signals.forever() {
+            if *thread_state.lock().unwrap() {
+                if !already_pressed {
                     println!(
-                        " {}Exiting..{}",
+                        " {}Waiting for function to end..{} (CTRL + C again to force kill)",
                         initialize_colors().bold_red,
                         initialize_colors().reset
                     );
-                    exit(0);
-                }
-                15 => {
-                    println!(
-                        " {}Exiting..{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    exit(1);
-                }
-                _ => {
-                    println!(
-                        " {}Exiting..{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    exit(1);
+                    already_pressed = true;
+                    continue;
+                } else {
+                    exit(2);
                 }
             }
+            println!(
+                " {}Exiting..{}",
+                initialize_colors().bold_red,
+                initialize_colors().reset
+            );
+            exit(1);
         }
     });
 
@@ -193,16 +194,21 @@ fn main() {
     }
 
     if args.add_repo != "none" {
+        *state.lock().unwrap() = true;
         add_repo(&args.add_repo, &args);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     if args.del_repo != "none" {
+        *state.lock().unwrap() = true;
         del_repo(args.del_repo);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     if args.sync {
+        *state.lock().unwrap() = true;
         let repos_file_location = format!(
             "{}/repos",
             get_data_dir()
@@ -261,17 +267,21 @@ fn main() {
                 colors.reset
             );
         }
+        *state.lock().unwrap() = false;
     }
 
     // Create backup to /etc/hosts.backup
     if args.backup {
+        *state.lock().unwrap() = true;
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.created_backup);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
+        *state.lock().unwrap() = true;
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.backup_already_restored);
             exit(1);
@@ -307,10 +317,12 @@ fn main() {
             println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
         }
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.backup_restored);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     if args.apply {
+        *state.lock().unwrap() = true;
         let local_hosts = format!(
             "{}/hosts",
             get_data_dir()
@@ -367,10 +379,12 @@ fn main() {
         }
 
         println!("   {}>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     if args.apply_android {
+        *state.lock().unwrap() = true;
         #[cfg(not(feature = "android"))]
         {
             println!(
@@ -387,6 +401,7 @@ fn main() {
             colors.bold_green,
             colors.reset
         );
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
