@@ -49,6 +49,8 @@ mod android;
 #[cfg(target_family = "windows")]
 mod windows;
 
+use crate::android::checks::check_android_feature;
+use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
@@ -89,6 +91,14 @@ pub struct Args {
     /// Start adblocker on your Android phone with ADB (experimental, root required)
     #[clap(long, value_parser, default_value_t = false)]
     apply_android: bool,
+
+    /// Specify android device (with device ID) (list devices with `--list-devices`)
+    #[clap(long, value_parser)]
+    android_device: Option<String>,
+
+    /// List all Android devices (need to have USB debugging on)
+    #[clap(long, value_parser, default_value_t = false)]
+    list_devices: bool,
 
     /// Sync the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
@@ -396,23 +406,26 @@ fn main() {
     // Apply changes on Android device (only if compiling with `feature` crate)
     if args.apply_android {
         *state.lock().unwrap() = true;
-        #[cfg(not(feature = "android"))]
-        {
-            println!(
-                "   {}>{} To use this feature, you need to compile Blokator with `android` feature.",
-                colors.bold_red,
-                colors.reset
-            );
-            exit(1);
-        }
 
-        apply_android();
+        check_android_feature();
+
+        apply_android(&args);
         println!(
             "   {}>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
             colors.bold_green,
             colors.reset
         );
         *state.lock().unwrap() = false;
+        exit(0);
+    }
+
+    if args.list_devices {
+        check_android_feature();
+
+        *state.lock().unwrap() = true;
+        list_devices();
+        *state.lock().unwrap() = false;
+        
         exit(0);
     }
 
