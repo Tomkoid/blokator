@@ -30,8 +30,11 @@ fn verify_repo(repo: &String, args: &Args) {
     let mut client = reqwest::blocking::ClientBuilder::new();
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
-    if args.tor {
+ 
+    if args.tor_all {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
+    } else if args.tor && repo.contains(".onion") {
+        client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
     client.build().unwrap().get(repo).send().unwrap_or_else(|e| {
