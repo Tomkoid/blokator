@@ -79,7 +79,7 @@ const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.bac
 const MESSAGES: GenericMessages = GenericMessages::new();
 const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
 pub struct Args {
     /// Start the adblocker
@@ -118,6 +118,10 @@ pub struct Args {
     #[clap(short, long, value_parser, default_value_t = false)]
     tor: bool,
 
+    // Proxy ALL traffic with TOR proxy
+    #[clap(short = 'A', long, value_parser, default_value_t = false)]
+    tor_all: bool,
+
     /// Change TOR bind address
     #[clap(long, value_parser, default_value = "127.0.0.1")]
     tor_bind_address: String,
@@ -137,7 +141,7 @@ pub enum Actions {
 
 fn main() {
     // This will be true if some action is running
-    let mut state = Arc::new(Mutex::new(false));
+    let state = Arc::new(Mutex::new(false));
 
     // Signal handling (ex: CTRL + c)
     #[cfg(target_os = "linux")]
@@ -175,16 +179,18 @@ fn main() {
     // Initialize colors
     let colors = initialize_colors();
 
+    // Parse arguments
     let args = Args::parse();
 
-    // Check if user is running blokator as root / administrator
+    // Check if user is running blokator as root / administrator, otherwise exit
     handle_permissions();
 
-    // Initialize important directories
+    // Initialize important directories if they are not already initialized
     if !already_initialized() {
         initialize_dir();
     }
 
+    // List repos
     if args.list_repos {
         let repos_list = list_repos();
         for repo in repos_list {
@@ -193,6 +199,7 @@ fn main() {
         exit(0);
     }
 
+    // Add repo
     if args.add_repo != "none" {
         *state.lock().unwrap() = true;
         add_repo(&args.add_repo, &args);
@@ -200,6 +207,7 @@ fn main() {
         exit(0);
     }
 
+    // Delete repo
     if args.del_repo != "none" {
         *state.lock().unwrap() = true;
         del_repo(args.del_repo);
@@ -207,6 +215,7 @@ fn main() {
         exit(0);
     }
 
+    // Sync all repositories
     if args.sync {
         *state.lock().unwrap() = true;
         let repos_file_location = format!(
@@ -321,6 +330,7 @@ fn main() {
         exit(0);
     }
 
+    // Apply changes
     if args.apply {
         *state.lock().unwrap() = true;
         let local_hosts = format!(
@@ -383,6 +393,7 @@ fn main() {
         exit(0);
     }
 
+    // Apply changes on Android device (only if compiling with `feature` crate)
     if args.apply_android {
         *state.lock().unwrap() = true;
         #[cfg(not(feature = "android"))]
