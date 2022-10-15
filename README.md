@@ -76,7 +76,7 @@ You can install **Blokator** easily with Cargo package manager:
 ```
 cargo install blokator
 ```
-**MAKE SURE THAT ~/.cargo/bin IS IN YOUR `$PATH`**
+**MAKE SURE THAT `~/.cargo/bin` IS IN YOUR `$PATH`**
 
 #### With Git
 First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to your local machine:
