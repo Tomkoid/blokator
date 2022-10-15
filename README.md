@@ -26,12 +26,13 @@ Blokator can run basically everywhere. These are the tested platforms:
 ## Supported init systems
 - SystemD
 - Runit
-- OpenRC (restarting NetworkManager issue with OpenRC is in Known Issues category below)
+- OpenRC
 
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
 - Colors don't work in Windows
+- OpenRC NetworkManager restart can return exit with status `1` so Blokator thinks that the restart of NetworkManager failed
 
 ## Usage
 After you installed Blokator, you need to sync the hosts files. To sync the hosts files, run Blokator with **--sync** argument:
