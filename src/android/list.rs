@@ -55,6 +55,6 @@ pub fn list_devices() {
             if index == 1 { device_state = section; }
         }
 
-        println!("{device_id}    {device_state}");
+        println!("{device_id}\t{device_state}");
     }
 }
