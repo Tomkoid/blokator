@@ -20,9 +20,8 @@ Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresse
 ## Compatibility
 Blokator can run basically everywhere. These are the tested platforms:
 - Linux (just works)
-- BSDs (not that much tested as Linux)
-- Windows (not tested much)
-- Redox (basically working)
+- BSDs (just works)
+- Windows (works, but for normal Windows user it is not user-friendly)
 
 ## Supported init systems
 - SystemD
