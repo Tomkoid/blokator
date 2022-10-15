@@ -20,19 +20,19 @@ Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresse
 ## Compatibility
 Blokator can run basically everywhere. These are the tested platforms:
 - Linux (just works)
-- BSDs (not that much tested as Linux)
-- Windows (not tested much)
-- Redox (basically working)
+- BSDs (just works)
+- Windows (works, but for normal Windows user it is not user-friendly)
 
 ## Supported init systems
 - SystemD
 - Runit
-- OpenRC (restarting NetworkManager issue with OpenRC is in Known Issues category below)
+- OpenRC
 
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
 - Colors don't work in Windows
+- OpenRC NetworkManager restart can return exit with status `1` so Blokator thinks that the restart of NetworkManager failed
 
 ## Usage
 After you installed Blokator, you need to sync the hosts files. To sync the hosts files, run Blokator with **--sync** argument:
@@ -76,6 +76,7 @@ You can install **Blokator** easily with Cargo package manager:
 ```
 cargo install blokator
 ```
+**MAKE SURE THAT ~/.cargo/bin IS IN YOUR `$PATH`**
 
 #### With Git
 First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to your local machine:
