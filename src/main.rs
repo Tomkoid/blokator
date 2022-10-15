@@ -45,10 +45,12 @@ mod repos;
 mod handle_permissions;
 mod allowed_exit_functions;
 mod android;
+mod arguments;
 
 #[cfg(target_family = "windows")]
 mod windows;
 
+use arguments::Args;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
@@ -81,67 +83,6 @@ const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.bac
 const MESSAGES: GenericMessages = GenericMessages::new();
 const HELP_MESSAGES: HelpMessages = HelpMessages::new();
 
-#[derive(Parser, Debug, Clone)]
-#[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
-pub struct Args {
-    /// Start the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    apply: bool,
-
-    /// Start adblocker on your Android phone with ADB (experimental, root required)
-    #[clap(long, value_parser, default_value_t = false)]
-    apply_android: bool,
-
-    /// Specify android device (with device ID) (list devices with `--list-devices`)
-    #[clap(long, value_parser)]
-    android_device: Option<String>,
-
-    /// List all Android devices (need to have USB debugging on)
-    #[clap(long, value_parser, default_value_t = false)]
-    list_devices: bool,
-
-    /// Sync the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    sync: bool,
-
-    /// Restore /etc/hosts backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    restore: bool,
-
-    /// Create a backup to /etc/hosts.backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    backup: bool,
-
-    /// Add repo for hosts files
-    #[clap(short = 'm', long, value_parser, default_value = "none")]
-    add_repo: String,
-
-    /// List all repos
-    #[clap(short, long, value_parser, default_value_t = false)]
-    list_repos: bool,
-
-    /// Delete specified repo from the repo list
-    #[clap(short, long, value_parser, default_value = "none")]
-    del_repo: String,
-
-    /// Use TOR proxy for making requests
-    #[clap(short, long, value_parser, default_value_t = false)]
-    tor: bool,
-
-    // Proxy ALL traffic with TOR proxy
-    #[clap(short = 'A', long, value_parser, default_value_t = false)]
-    tor_all: bool,
-
-    /// Change TOR bind address
-    #[clap(long, value_parser, default_value = "127.0.0.1")]
-    tor_bind_address: String,
-
-    /// Change TOR port
-    #[clap(long, value_parser, default_value_t = 9050)]
-    tor_port: i32,
-
-}
-
 #[derive(PartialEq, Eq)]
 pub enum Actions {
     Restore,
@@ -167,7 +108,7 @@ fn main() {
             if *thread_state.lock().unwrap() {
                 if !already_pressed {
                     println!(
-                        " {}Waiting for function to end..{} (CTRL + C again to force kill)",
+                        " {}Force kill with CTRL + C{}",
                         initialize_colors().bold_red,
                         initialize_colors().reset
                     );
@@ -323,7 +264,7 @@ fn main() {
             } else {
                 // Init 2 = OpenRC
                 /*
-                 * OpenRC returns 1 as a exit code when printing errors and
+                 * OpenRC sometime returns 1 as a exit code when printing errors and
                  * warning, which is the same exit code
                  */
                 if get_init() == 2 {
