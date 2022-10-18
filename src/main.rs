@@ -54,13 +54,13 @@ use arguments::Args;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
+use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 
 use crate::colors::Colors;
 use crate::messages::{GenericMessages, HelpMessages};
 use crate::read::read_file_to_string;
-use crate::services::init::{ restart_networkmanager, exists_networkmanager };
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
@@ -247,35 +247,7 @@ fn main() {
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
-        if exists_networkmanager() {
-            print!(
-                "{}==>{} Restarting NetworkManager..",
-                colors.bold_blue,
-                colors.reset
-            );
-
-            let networkmanager_status = match restart_networkmanager() {
-                Ok(s) => s,
-                Err(e) => panic!("couldn't restart NetworkManager: {e}")
-            };
-
-            if networkmanager_status.success() {
-                println!(" {}done{}", colors.bold_green, colors.reset);
-            } else {
-                // Init 2 = OpenRC
-                /*
-                 * OpenRC sometime returns 1 as a exit code when printing errors and
-                 * warning, which is the same exit code
-                 */
-                if get_init() == 2 {
-                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
-                } else {
-                    println!(" {}failed{}", colors.bold_red, colors.reset);
-                }
-            }
-        } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
-        }
+        restart_networkmanager();
         println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.backup_restored);
         *state.lock().unwrap() = false;
         exit(0);
@@ -309,35 +281,7 @@ fn main() {
         // Rewrite /etc/hosts
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
-        if exists_networkmanager() {
-            print!(
-                "   {}>{} Restarting NetworkManager..",
-                colors.bold_blue,
-                colors.reset
-            );
-
-            let networkmanager_status = match restart_networkmanager() {
-                Ok(s) => s,
-                Err(e) => panic!("couldn't restart NetworkManager: {e}")
-            };
-
-            if networkmanager_status.success() {
-                println!(" {}done{}", colors.bold_green, colors.reset);
-            } else {
-                // Init 2 = OpenRC
-                /*
-                 * OpenRC returns 1 as a exit code when printing errors and
-                 * warning, which is the same exit code
-                 */
-                if get_init() == 2 {
-                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
-                } else {
-                    println!(" {}failed{}", colors.bold_red, colors.reset);
-                }
-            }
-        } else {
-            println!("   {}>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
-        }
+        restart_networkmanager();
 
         println!("   {}>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
         *state.lock().unwrap() = false;

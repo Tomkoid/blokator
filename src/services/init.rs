@@ -47,7 +47,7 @@ pub fn exists_networkmanager() -> bool {
     get_init() != -1
 }
 
-pub fn restart_networkmanager() -> Result<std::process::ExitStatus, std::io::Error> {
+pub fn restart_networkmanager_init() -> Result<std::process::ExitStatus, std::io::Error> {
     match get_init() {
         0 => networkmanager_systemd_restart(),
         1 => networkmanager_runit_restart(),
