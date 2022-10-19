@@ -26,12 +26,6 @@ use std::path::Path;
 use std::io::Write;
 use std::sync::{ Arc, Mutex };
 
-#[cfg(target_os = "linux")]
-use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
-
-#[cfg(target_os = "linux")]
-use std::thread;
-
 pub mod read;
 pub mod write;
 pub mod messages;
@@ -43,6 +37,7 @@ mod initialize_dirs;
 mod initialize_colors;
 mod repos;
 mod handle_permissions;
+mod signal_handling;
 mod allowed_exit_functions;
 mod android;
 mod arguments;
@@ -66,6 +61,7 @@ use crate::sync::sync;
 use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
+use crate::signal_handling::handle_signals;
 use crate::allowed_exit_functions::check_allowed_function;
 use crate::services::init::get_init;
 use crate::android::apply::apply_android;
@@ -94,38 +90,11 @@ fn main() {
     // This will be true if some action is running
     let state = Arc::new(Mutex::new(false));
 
-    // Signal handling (ex: CTRL + c)
-    #[cfg(target_os = "linux")]
-    let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
-   
     #[cfg(target_os = "linux")]
     let thread_state = Arc::clone(&state);
 
     #[cfg(target_os = "linux")]
-    thread::spawn(move || {
-        let mut already_pressed = false;
-        for _ in signals.forever() {
-            if *thread_state.lock().unwrap() {
-                if !already_pressed {
-                    println!(
-                        " {}Force kill with CTRL + C{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    already_pressed = true;
-                    continue;
-                } else {
-                    exit(2);
-                }
-            }
-            println!(
-                " {}Exiting..{}",
-                initialize_colors().bold_red,
-                initialize_colors().reset
-            );
-            exit(1);
-        }
-    });
+    handle_signals(thread_state);
 
     // Initialize colors
     let colors = initialize_colors();
