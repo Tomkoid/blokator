@@ -121,11 +121,8 @@ sudo cp target/release/blokator /usr/bin/blokator
 **You're done now!**
 
 ### From package manager
-At this moment, Blokator is available only in [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) for **[Arch Linux](https://archlinux.org)**.
+At this moment, Blokator is available only in [AUR](https://aur.archlinux.org) or [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) for **[Arch Linux](https://archlinux.org)**.
 
-Installation guide for [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) is in the **README**.
+To download Blokator from AUR it's recommended to use [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install Blokator. 
 
-You can install **Blokator** with pacman:
-```
-sudo pacman -Sy blokator
-```
+Checkout [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) installation in **README.md**.
