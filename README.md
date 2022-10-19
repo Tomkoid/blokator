@@ -65,6 +65,8 @@ To display the help page with all available commands, you can run Blokator with 
 blokator --help
 ```
 
+**You will find more usage examples in man page**
+
 ## Installation
 ### Manual / Compilation
 Before you begin, make sure you have installed these things:
