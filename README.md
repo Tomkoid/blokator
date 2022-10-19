@@ -76,6 +76,13 @@ You can install **Blokator** easily with Cargo package manager:
 ```
 cargo install blokator
 ```
+
+or if you want Android support: (not recommended yet)
+
+```
+cargo install blokator --features android
+```
+
 **MAKE SURE THAT `~/.cargo/bin` IS IN YOUR `$PATH`**
 
 #### With Git
@@ -91,10 +98,16 @@ Now CD into that directory:
 cd blokator
 ```
 
-In that directory we can compile **Blokator**:
+In that directory you can compile **Blokator**:
 
 ```
 cargo build --release
+```
+
+or if you want Android support: (not recommended yet)
+
+```
+cargo build --release --features android
 ```
 
 And install it to the system:
