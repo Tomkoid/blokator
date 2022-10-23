@@ -7,8 +7,8 @@ Cargo.lock
 # Pacman auto generated files
 *.pkg.tar.zst
 *.pkg.tar.zst.sig
-archlinux-pkgbuild/src
-archlinux-pkgbuild/target
-archlinux-pkgbuild/pkg
-archlinux-pkgbuild/blokator
-archlinux-pkgbuild/blokator-aur
+packages/archlinux/src
+packages/archlinux/target
+packages/archlinux/pkg
+packages/archlinux/blokator
+packages/archlinux/blokator-aur
