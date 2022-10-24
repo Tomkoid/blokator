@@ -1,5 +1,5 @@
 # Blokator
-**Simple cross-platform and system-wide CLI adblocker**
+**Simple system-wide CLI adblocker**
 
 [![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
 
