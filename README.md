@@ -31,7 +31,7 @@ Blokator can run basically everywhere. These are the tested platforms:
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
 ## Known issues
-- Colors don't work in Windows
+- Colors don't work on Windows
 - OpenRC NetworkManager restart can return exit with status `1` so Blokator thinks that the restart of NetworkManager failed
 
 ## Usage
