@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Blokator
+Exec=blokator %u
+Icon=blokator
+Type=Application
+Categories=Utility

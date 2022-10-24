@@ -11,4 +11,4 @@ then
 fi
 
 sed -i "s/$1/$2/g" Cargo.toml
-sed -i "s/$1/$2/g" archlinux-pkgbuild/PKGBUILD
+sed -i "s/$1/$2/g" packages/archlinux/PKGBUILD

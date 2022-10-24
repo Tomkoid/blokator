@@ -4,6 +4,12 @@ target/
 # Auto generated lock files by compiler
 Cargo.lock
 
+# Generated AppImages
+*.AppImage
+
+# Binaries in AppImage /usr/bin
+packages/Blokator.AppDir/usr/bin/blokator
+
 # Pacman auto generated files
 *.pkg.tar.zst
 *.pkg.tar.zst.sig
