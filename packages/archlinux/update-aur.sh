@@ -3,6 +3,8 @@
 # USAGE:
 # ./update-aur.sh <version>
 
+export GPG_TTY=$(tty)
+
 if [ "$1" == "" ]
 then
   echo "error: Not enough arguments."
