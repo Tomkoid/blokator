@@ -155,6 +155,14 @@ fn main() {
         }
 
         let repos = read_file_to_string(&repos_file_location).unwrap();
+        if repos.trim().is_empty() {
+            println!(
+                "  [{}*{}] There are no repos to sync.",
+                colors.bold_blue,
+                colors.reset
+            );
+            exit(1);
+        }
         for repo in repos.lines() {
             if repo.is_empty() {
                 continue;

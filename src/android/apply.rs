@@ -34,7 +34,7 @@ pub fn apply_android(args: &Args) {
         Some(value) => value,
         None => {
             println!(
-                "{}error:{} No device specified\n{}HELP:{} try to specify device with `--android-device <device ID>`, list devices with `--list-devices` argument",
+                "{}error:{} No device was specified\n{}HELP:{} try to specify device with `--android-device <device ID>`, list devices with `--list-devices` argument",
                 colors.bold_red,
                 colors.reset,
                 colors.bold_green,
