@@ -11,8 +11,10 @@ Cargo.lock
 packages/Blokator.AppDir/usr/bin/blokator
 
 # Pacman auto generated files
-*.pkg.tar.zst
-*.pkg.tar.zst.sig
+packages/archlinux/*.pkg.tar.zst
+packages/archlinux/*.pkg.tar.zst.sig
+packages/archlinux/*.pkg.tar.gz
+packages/archlinux/*.pkg.tar.gz.sig
 packages/archlinux/src
 packages/archlinux/target
 packages/archlinux/pkg
