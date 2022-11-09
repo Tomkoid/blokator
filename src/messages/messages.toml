@@ -1,0 +1,30 @@
+[message]
+root_is_required = "You need to run this command with root privilegies, to run the adblocker"
+synced = "Synced the adblocker."
+synced_no_change = "No change"
+created_backup = "Backup created."
+backup_already_restored = "Backup already restored."
+backup_restored = "Backup restored."
+networkmanager_restart = "Restarted NetworkManager.service successfully."
+networkmanager_couldnt_restart = "Couldn't restart NetworkManager.service."
+networkmanager_restart_manually = "Manually restart the networking service or restart the system."
+local_hosts_missing = "Can't apply, because the local hosts are missing."
+etc_hosts_missing = "Can't apply, because the /etc/hosts file is missing."
+already_applied = "Latest ad list already applied."
+adblocker_started = "Blokator started."
+no_action_specified = "No action specified."
+permission_denied = "Permission Denied"
+unknown_error = "Error occurred"
+
+[help_message]
+local_hosts_missing = "run blokator with `--sync` argument."
+no_action_specified = "run blokator with `--help` argument to see all available commands."
+
+[restore_message]
+not_found = "Tried to restore the backup, but the backup doesn't exist"
+
+[backup_message]
+not_found = "Tried to backup the /etc/hosts file, but /etc/hosts file doesn't exist"
+
+[apply_message]
+not_found = "Tried to start the adblocker, but the /etc/hosts file doesn't exist"

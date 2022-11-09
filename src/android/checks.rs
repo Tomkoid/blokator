@@ -22,7 +22,23 @@ use std::io::ErrorKind;
 use std::process::Stdio;
 use crate::initialize_colors;
 
-pub fn device_ready() -> bool {
+pub fn check_android_feature() {
+    #[allow(unused_variables)]
+    let colors = initialize_colors();
+
+    #[cfg(not(feature = "android"))]
+    {
+        println!(
+            "   {}>{} To use this feature, you need to compile Blokator with `android` feature.",
+            colors.bold_red,
+            colors.reset
+        );
+        exit(1);
+    }
+
+}
+
+pub fn device_ready(device: &str) -> bool {
     let devices = Command::new("adb")
         .stdout(Stdio::piped())
         .arg("devices")
@@ -30,13 +46,21 @@ pub fn device_ready() -> bool {
         .unwrap();
 
     let devices_output = String::from_utf8(devices.stdout).unwrap();
-
-    let mut index = 0;
-    for line in devices_output.lines() {
-        if index == 1 && line.contains("device") { return true; }
-        index += 1;
-    }
     
+    for line in devices_output.lines() {
+        let mut line_splitted = "";
+
+        for (index, line) in line.trim().split("\t").enumerate() {
+            if index == 0 { 
+                line_splitted = line;
+                break;
+            }
+        }
+
+        // If line contains device ID
+        if line_splitted == device && line.trim().contains("device") { return true; }
+    }
+
     false
 }
 

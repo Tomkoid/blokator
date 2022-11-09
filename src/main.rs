@@ -16,18 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#![allow(unreachable_code)]
+
 use clap::Parser;
 use dirs::home_dir;
 use std::fs;
 use std::process::exit;
 use std::path::Path;
 use std::io::Write;
-
-#[cfg(target_os = "linux")]
-use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
-
-#[cfg(target_os = "linux")]
-use std::thread;
+use std::sync::{ Arc, Mutex };
 
 pub mod read;
 pub mod write;
@@ -40,25 +37,31 @@ mod initialize_dirs;
 mod initialize_colors;
 mod repos;
 mod handle_permissions;
+mod signal_handling;
 mod allowed_exit_functions;
 mod android;
+mod arguments;
 
 #[cfg(target_family = "windows")]
 mod windows;
 
+use arguments::Args;
+use crate::android::checks::check_android_feature;
+use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
+use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 
 use crate::colors::Colors;
-use crate::messages::{GenericMessages, HelpMessages};
+use crate::messages::Messages;
 use crate::read::read_file_to_string;
-use crate::services::init::{ restart_networkmanager, exists_networkmanager };
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
 use crate::copy::copy;
 use crate::repos::{add_repo, list_repos, del_repo};
 use crate::handle_permissions::handle_permissions;
+use crate::signal_handling::handle_signals;
 use crate::allowed_exit_functions::check_allowed_function;
 use crate::services::init::get_init;
 use crate::android::apply::apply_android;
@@ -73,58 +76,6 @@ const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
 #[cfg(target_family = "windows")]
 const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
 
-const MESSAGES: GenericMessages = GenericMessages::new();
-const HELP_MESSAGES: HelpMessages = HelpMessages::new();
-
-#[derive(Parser, Debug)]
-#[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
-pub struct Args {
-    /// Start the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    apply: bool,
-
-    /// Start adblocker on your Android phone with ADB (experimental, root required)
-    #[clap(long, value_parser, default_value_t = false)]
-    apply_android: bool,
-
-    /// Sync the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    sync: bool,
-
-    /// Restore /etc/hosts backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    restore: bool,
-
-    /// Create a backup to /etc/hosts.backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    backup: bool,
-
-    /// Add repo for hosts files
-    #[clap(short = 'm', long, value_parser, default_value = "none")]
-    add_repo: String,
-
-    /// List all repos
-    #[clap(short, long, value_parser, default_value_t = false)]
-    list_repos: bool,
-
-    /// Delete specified repo from the repo list
-    #[clap(short, long, value_parser, default_value = "none")]
-    del_repo: String,
-
-    /// Use TOR proxy for making requests
-    #[clap(short, long, value_parser, default_value_t = false)]
-    tor: bool,
-
-    /// Change TOR bind address
-    #[clap(long, value_parser, default_value = "127.0.0.1")]
-    tor_bind_address: String,
-
-    /// Change TOR port
-    #[clap(long, value_parser, default_value_t = 9050)]
-    tor_port: i32,
-
-}
-
 #[derive(PartialEq, Eq)]
 pub enum Actions {
     Restore,
@@ -133,55 +84,33 @@ pub enum Actions {
 }
 
 fn main() {
-    // Signal handling (ex: CTRL + c)
+    // This will be true if some action is running
+    let state = Arc::new(Mutex::new(false));
+
     #[cfg(target_os = "linux")]
-    let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
-   
+    let thread_state = Arc::clone(&state);
+
     #[cfg(target_os = "linux")]
-    thread::spawn(move || {
-        for sig in signals.forever() {
-            match sig {
-                2 => {
-                    println!(
-                        " {}Exiting..{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    exit(0);
-                }
-                15 => {
-                    println!(
-                        " {}Exiting..{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    exit(1);
-                }
-                _ => {
-                    println!(
-                        " {}Exiting..{}",
-                        initialize_colors().bold_red,
-                        initialize_colors().reset
-                    );
-                    exit(1);
-                }
-            }
-        }
-    });
+    handle_signals(thread_state);
 
     // Initialize colors
     let colors = initialize_colors();
-
+    
+    // Initialize messages
+    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
+    
+    // Parse arguments
     let args = Args::parse();
 
-    // Check if user is running blokator as root / administrator
+    // Check if user is running blokator as root / administrator, otherwise exit
     handle_permissions();
 
-    // Initialize important directories
+    // Initialize important directories if they are not already initialized
     if !already_initialized() {
         initialize_dir();
     }
 
+    // List repos
     if args.list_repos {
         let repos_list = list_repos();
         for repo in repos_list {
@@ -190,17 +119,25 @@ fn main() {
         exit(0);
     }
 
+    // Add repo
     if args.add_repo != "none" {
+        *state.lock().unwrap() = true;
         add_repo(&args.add_repo, &args);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
+    // Delete repo
     if args.del_repo != "none" {
+        *state.lock().unwrap() = true;
         del_repo(args.del_repo);
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
+    // Sync all repositories
     if args.sync {
+        *state.lock().unwrap() = true;
         let repos_file_location = format!(
             "{}/repos",
             get_data_dir()
@@ -218,6 +155,14 @@ fn main() {
         }
 
         let repos = read_file_to_string(&repos_file_location).unwrap();
+        if repos.trim().is_empty() {
+            println!(
+                "  [{}*{}] There are no repos to sync.",
+                colors.bold_blue,
+                colors.reset
+            );
+            exit(1);
+        }
         for repo in repos.lines() {
             if repo.is_empty() {
                 continue;
@@ -259,70 +204,58 @@ fn main() {
                 colors.reset
             );
         }
+        *state.lock().unwrap() = false;
     }
 
     // Create backup to /etc/hosts.backup
     if args.backup {
+        *state.lock().unwrap() = true;
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.created_backup);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("created_backup").unwrap());
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
+        *state.lock().unwrap() = true;
+        if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
+            println!(
+                "{}==>{} {}",
+                colors.bold_red,
+                colors.reset,
+                messages.restore_message.get("not_found").unwrap()
+            );
+            exit(1);
+        }
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.backup_already_restored);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.message.get("backup_already_restored").unwrap());
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
-        if exists_networkmanager() {
-            print!(
-                "{}==>{} Restarting NetworkManager..",
-                colors.bold_blue,
-                colors.reset
-            );
-
-            let networkmanager_status = match restart_networkmanager() {
-                Ok(s) => s,
-                Err(e) => panic!("couldn't restart NetworkManager: {e}")
-            };
-
-            if networkmanager_status.success() {
-                println!(" {}done{}", colors.bold_green, colors.reset);
-            } else {
-                // Init 2 = OpenRC
-                /*
-                 * OpenRC returns 1 as a exit code when printing errors and
-                 * warning, which is the same exit code
-                 */
-                if get_init() == 2 {
-                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
-                } else {
-                    println!(" {}failed{}", colors.bold_red, colors.reset);
-                }
-            }
-        } else {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
-        }
-        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.backup_restored);
+        restart_networkmanager();
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("backup_restored").unwrap());
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
+    // Apply changes
     if args.apply {
+        *state.lock().unwrap() = true;
         let local_hosts = format!(
             "{}/hosts",
             get_data_dir()
         );
         if !Path::new(&local_hosts).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.local_hosts_missing);
-            println!("  {}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.local_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("local_hosts_missing").unwrap());
+            println!("  {}Help:{} {}", colors.bold_green, colors.reset, messages.help_message.get("local_hosts_missing").unwrap());
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.etc_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("etc_hosts_missing").unwrap());
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, MESSAGES.already_applied);
+            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, messages.message.get("already_applied").unwrap());
             exit(1);
         }
                
@@ -334,55 +267,44 @@ fn main() {
         // Rewrite /etc/hosts
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
         
-        if exists_networkmanager() {
-            print!(
-                "   {}>{} Restarting NetworkManager..",
-                colors.bold_blue,
-                colors.reset
-            );
+        restart_networkmanager();
 
-            let networkmanager_status = match restart_networkmanager() {
-                Ok(s) => s,
-                Err(e) => panic!("couldn't restart NetworkManager: {e}")
-            };
-
-            if networkmanager_status.success() {
-                println!(" {}done{}", colors.bold_green, colors.reset);
-            } else {
-                // Init 2 = OpenRC
-                /*
-                 * OpenRC returns 1 as a exit code when printing errors and
-                 * warning, which is the same exit code
-                 */
-                if get_init() == 2 {
-                    println!(" {}failed / warning{}", colors.bold_red, colors.reset);
-                } else {
-                    println!(" {}failed{}", colors.bold_red, colors.reset);
-                }
-            }
-        } else {
-            println!("   {}>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
-        }
-
-        println!("   {}>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
+        println!("   {}>{} {}", colors.bold_green, colors.reset, messages.message.get("adblocker_started").unwrap());
+        *state.lock().unwrap() = false;
         exit(0);
     }
 
+    // Apply changes on Android device (only if compiling with `feature` crate)
     if args.apply_android {
-        apply_android();
+        *state.lock().unwrap() = true;
+
+        check_android_feature();
+
+        apply_android(&args);
         println!(
             "   {}>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
             colors.bold_green,
             colors.reset
         );
+        *state.lock().unwrap() = false;
+        exit(0);
+    }
+
+    if args.list_devices {
+        check_android_feature();
+
+        *state.lock().unwrap() = true;
+        list_devices();
+        *state.lock().unwrap() = false;
+        
         exit(0);
     }
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
 
-    println!("{}error:{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
-    println!("{}HELP:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);
+    println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("no_action_specified").unwrap());
+    println!("{}HELP:{} {}", colors.bold_green, colors.reset, messages.help_message.get("no_action_specified").unwrap());
     exit(1);
 }
 

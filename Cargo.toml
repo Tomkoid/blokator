@@ -1,6 +1,6 @@
 [package]
 name = "blokator"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 description = "Simple system-wide adblocker"
 readme = "README.md"
@@ -10,6 +10,9 @@ license = "GPL-3.0"
 keywords = ["blokator", "system", "wide", "hosts", "adblocker"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+android = []
 
 [profile.release]
 strip = true
@@ -23,6 +26,8 @@ clap = { version = "3.2.17", default-features = false, features = ["std", "color
 dirs = { version = "4.0.0", default-features = false }
 nix = { version = "0.25.0" }
 reqwest = { version = "0.11.11", features = ["blocking", "socks"] }
+serde = { version = "1.0.147", features = ["derive"] }
+toml = "0.5.9"
 
 [target.'cfg(unix)'.dependencies]
 signal-hook = "0.3.14"

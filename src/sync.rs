@@ -24,12 +24,14 @@ pub fn sync(repo: &str, args: &Args) {
     let colors = initialize_colors(); 
 
     let mut client = reqwest::blocking::ClientBuilder::new();
-
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
-    if args.tor {
+
+    if args.tor_all {
+        client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
+    } else if args.tor && repo.contains(".onion") {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
-
+ 
     let response = client.build().unwrap().get(repo).send();
     
     let local_hosts = format!(
