@@ -54,7 +54,7 @@ use crate::services::networkmanager::restart_networkmanager;
 use crate::windows::is_elevated;
 
 use crate::colors::Colors;
-use crate::messages::{GenericMessages, HelpMessages};
+use crate::messages::Messages;
 use crate::read::read_file_to_string;
 use crate::initialize_dirs::{ already_initialized, initialize_dir };
 use crate::sync::sync;
@@ -76,9 +76,6 @@ const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
 #[cfg(target_family = "windows")]
 const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
 
-const MESSAGES: GenericMessages = GenericMessages::new();
-const HELP_MESSAGES: HelpMessages = HelpMessages::new();
-
 #[derive(PartialEq, Eq)]
 pub enum Actions {
     Restore,
@@ -98,7 +95,10 @@ fn main() {
 
     // Initialize colors
     let colors = initialize_colors();
-
+    
+    // Initialize messages
+    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
+    
     // Parse arguments
     let args = Args::parse();
 
@@ -211,7 +211,7 @@ fn main() {
     if args.backup {
         *state.lock().unwrap() = true;
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.created_backup);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("created_backup").unwrap());
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -219,13 +219,22 @@ fn main() {
     // Restore backup from /etc/hosts.backup to /etc/hosts
     if args.restore {
         *state.lock().unwrap() = true;
+        if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
+            println!(
+                "{}==>{} {}",
+                colors.bold_red,
+                colors.reset,
+                messages.restore_message.get("not_found").unwrap()
+            );
+            exit(1);
+        }
         if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.backup_already_restored);
+            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.message.get("backup_already_restored").unwrap());
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         restart_networkmanager();
-        println!("{}==>{} {}", colors.bold_green, colors.reset, MESSAGES.backup_restored);
+        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("backup_restored").unwrap());
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -238,15 +247,15 @@ fn main() {
             get_data_dir()
         );
         if !Path::new(&local_hosts).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.local_hosts_missing);
-            println!("  {}Help:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.local_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("local_hosts_missing").unwrap());
+            println!("  {}Help:{} {}", colors.bold_green, colors.reset, messages.help_message.get("local_hosts_missing").unwrap());
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, MESSAGES.etc_hosts_missing);
+            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("etc_hosts_missing").unwrap());
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, MESSAGES.already_applied);
+            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, messages.message.get("already_applied").unwrap());
             exit(1);
         }
                
@@ -260,7 +269,7 @@ fn main() {
         
         restart_networkmanager();
 
-        println!("   {}>{} {}", colors.bold_green, colors.reset, MESSAGES.adblocker_started);
+        println!("   {}>{} {}", colors.bold_green, colors.reset, messages.message.get("adblocker_started").unwrap());
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -294,8 +303,8 @@ fn main() {
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
 
-    println!("{}error:{} {}", colors.bold_red, colors.reset, MESSAGES.no_action_specified);
-    println!("{}HELP:{} {}", colors.bold_green, colors.reset, HELP_MESSAGES.no_action_specified);
+    println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("no_action_specified").unwrap());
+    println!("{}HELP:{} {}", colors.bold_green, colors.reset, messages.help_message.get("no_action_specified").unwrap());
     exit(1);
 }
 

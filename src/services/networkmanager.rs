@@ -19,13 +19,12 @@
 use crate::initialize_colors::initialize_colors;
 use crate::services::init::restart_networkmanager_init;
 use super::init::exists_networkmanager;
-use crate::GenericMessages;
+use crate::Messages;
 use crate::get_init;
-
-const MESSAGES: GenericMessages = GenericMessages::new();
 
 pub fn restart_networkmanager() {
     let colors = initialize_colors();
+    let messages: Messages = toml::from_str(include_str!("../messages/messages.toml")).unwrap();
 
     if exists_networkmanager() {
         print!(
@@ -54,6 +53,6 @@ pub fn restart_networkmanager() {
             }
         }
     } else {
-       println!("{}==>{} {}", colors.bold_yellow, colors.reset, MESSAGES.networkmanager_restart_manually);
+       println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.message.get("networkmanager_restart_manually").unwrap());
     }
 }

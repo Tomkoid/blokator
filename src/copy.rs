@@ -21,13 +21,25 @@ use std::process::exit;
 
 use crate::initialize_colors::initialize_colors;
 use crate::{write::write_to_file, read::read_file_to_string, Actions};
-use crate::messages::CopyMessages;
+use crate::messages::Messages;
 
 pub fn copy(from: &str, to: &str, action: Actions) {
     let colors = initialize_colors();
+    
+    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
 
-    let messages = CopyMessages::new(action);
-
+    let not_found_message = match action {
+        Actions::Restore => {
+            messages.restore_message.get("not_found").unwrap()
+        },
+        Actions::Backup => {
+            messages.backup_message.get("not_found").unwrap()
+        },
+        Actions::Apply => {
+            messages.apply_message.get("not_found").unwrap()
+        }
+    };
+    
     let output = match read_file_to_string(from) {
         Ok(s) => s,
         Err(e) => match e.kind() {
@@ -36,7 +48,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
                     "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
-                    messages.not_found,
+                    not_found_message,
                     e,
                     e.kind()
                 );
@@ -47,7 +59,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
                     "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
-                    messages.permission_denied,
+                    messages.message.get("permission_denied").unwrap(),
                     e,
                     e.kind()
                 );
@@ -58,7 +70,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
                     "{}error:{} {}: {} (Kind: {})",
                     colors.bold_red,
                     colors.reset,
-                    messages.unknown_error,
+                    messages.message.get("unknown_error").unwrap(),
                     e,
                     e.kind()
                 );

@@ -19,7 +19,7 @@
 use std::process::exit;
 use crate::initialize_colors;
 
-use crate::GenericMessages;
+use crate::Messages;
 
 #[cfg(target_family = "unix")]
 use nix::unistd::Uid;
@@ -27,21 +27,20 @@ use nix::unistd::Uid;
 #[cfg(target_family = "windows")]
 use crate::is_elevated;
 
-const MESSAGES: GenericMessages = GenericMessages::new();
-
 pub fn handle_permissions() {
     let colors = initialize_colors();
+    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
 
     // Check if the program is running with root permissions
     #[cfg(target_family = "unix")]
     if !Uid::effective().is_root() {
-        println!("{}error:{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
+        println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("root_is_required").unwrap());
         exit(1);
     }
 
     #[cfg(target_family = "windows")]
     if !is_elevated() {
-        println!("{}error:{} {}", colors.bold_red, colors.reset, MESSAGES.root_is_required);
+        println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("root_is_required").unwrap());
         exit(1);
     }
 }
