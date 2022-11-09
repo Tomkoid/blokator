@@ -1,4 +1,4 @@
-<h1 align="center">Blokator - Simple system-wide CLI adblocker</h1>
+<div align="center"><h1>Blokator - Simple system-wide CLI adblocker</h1></div>
 
 [![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
 
