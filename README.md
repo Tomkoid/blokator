@@ -71,6 +71,9 @@ blokator --help
 Before you begin, make sure you have installed these things:
 - Rust
 - Cargo
+- Make
+- OpenSSL
+- pkg-config
 
 #### With Cargo
 You can install **Blokator** easily with Cargo package manager:
@@ -93,19 +96,19 @@ First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to 
 git clone https://gitlab.com/Tomkoid/blokator.git
 ```
 
-Now CD into that directory:
+Now go to the new cloned directory directory:
 
 ```
 cd blokator
 ```
 
-In that directory you can compile **Blokator**:
+In that directory you can build **Blokator** using **make**:
 
 ```
-cargo build --release
+make build
 ```
 
-or if you want Android support: (not recommended yet)
+or if you want Android support (experimental):
 
 ```
 cargo build --release --features android
@@ -114,7 +117,7 @@ cargo build --release --features android
 And install it to the system:
 
 ```
-sudo cp target/release/blokator /usr/bin/blokator
+sudo make install
 ```
 
 **You're done now!**
