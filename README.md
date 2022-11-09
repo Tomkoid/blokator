@@ -96,7 +96,7 @@ First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to 
 git clone https://gitlab.com/Tomkoid/blokator.git
 ```
 
-Now go to the new cloned directory directory:
+Now go to the new cloned directory:
 
 ```
 cd blokator
