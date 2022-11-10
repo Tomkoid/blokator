@@ -20,26 +20,20 @@ use std::io::ErrorKind;
 use std::process::exit;
 
 use crate::initialize_colors::initialize_colors;
-use crate::{write::write_to_file, read::read_file_to_string, Actions};
 use crate::messages::Messages;
+use crate::{read::read_file_to_string, write::write_to_file, Actions};
 
 pub fn copy(from: &str, to: &str, action: Actions) {
     let colors = initialize_colors();
-    
+
     let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
 
     let not_found_message = match action {
-        Actions::Restore => {
-            messages.restore_message.get("not_found").unwrap()
-        },
-        Actions::Backup => {
-            messages.backup_message.get("not_found").unwrap()
-        },
-        Actions::Apply => {
-            messages.apply_message.get("not_found").unwrap()
-        }
+        Actions::Restore => messages.restore_message.get("not_found").unwrap(),
+        Actions::Backup => messages.backup_message.get("not_found").unwrap(),
+        Actions::Apply => messages.apply_message.get("not_found").unwrap(),
     };
-    
+
     let output = match read_file_to_string(from) {
         Ok(s) => s,
         Err(e) => match e.kind() {
@@ -76,7 +70,7 @@ pub fn copy(from: &str, to: &str, action: Actions) {
                 );
                 exit(1)
             }
-        }
+        },
     };
 
     write_to_file(to, output)

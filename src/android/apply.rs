@@ -16,10 +16,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::Args;
+use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
-use std::process::exit;
-use crate::Args;
 
 use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
@@ -46,12 +46,11 @@ pub fn apply_android(args: &Args) {
 
     adb_exists();
     match device_ready(android_device) {
-        true => {},
+        true => {}
         false => {
             println!(
                 "{}error:{} Device is not ready.",
-                colors.bold_red,
-                colors.reset
+                colors.bold_red, colors.reset
             );
             exit(1)
         }
@@ -59,7 +58,17 @@ pub fn apply_android(args: &Args) {
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
-        .args(["-s", &android_device, "shell", "su", "-c", "mount", "-o", "rw,remount", "/"])
+        .args([
+            "-s",
+            android_device,
+            "shell",
+            "su",
+            "-c",
+            "mount",
+            "-o",
+            "rw,remount",
+            "/",
+        ])
         .stdout(Stdio::piped())
         .status()
         .unwrap();
@@ -67,8 +76,7 @@ pub fn apply_android(args: &Args) {
     if !mount_system_as_rw.success() {
         println!(
             "{}error:{} Failed to mount system as read & write",
-            colors.bold_red,
-            colors.reset
+            colors.bold_red, colors.reset
         );
         exit(1);
     }
@@ -76,15 +84,20 @@ pub fn apply_android(args: &Args) {
     // Push temporary hosts file to /sdcard/hosts
     let push_sdcard = Command::new("adb")
         .stdout(Stdio::piped())
-        .args(["-s", &android_device, "push", &(get_data_dir() + "/hosts"), "/sdcard/hosts"])
+        .args([
+            "-s",
+            android_device,
+            "push",
+            &(get_data_dir() + "/hosts"),
+            "/sdcard/hosts",
+        ])
         .status()
         .unwrap();
 
     if !push_sdcard.success() {
         println!(
             "{}error:{} Cannot push the hosts file to the Android device",
-            colors.bold_red,
-            colors.reset
+            colors.bold_red, colors.reset
         );
         exit(1);
     }
@@ -92,15 +105,23 @@ pub fn apply_android(args: &Args) {
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
         .stdout(Stdio::piped())
-        .args(["-s", &android_device, "shell", "su", "-c", "'cp", "/etc/hosts", "/etc/hosts.backup'"])
+        .args([
+            "-s",
+            android_device,
+            "shell",
+            "su",
+            "-c",
+            "'cp",
+            "/etc/hosts",
+            "/etc/hosts.backup'",
+        ])
         .status()
         .unwrap();
 
     if !copy_etc_hosts.success() {
         println!(
             "{}error:{} Cannot make a backup of the hosts file",
-            colors.bold_red,
-            colors.reset
+            colors.bold_red, colors.reset
         );
         exit(1);
     }
@@ -108,22 +129,40 @@ pub fn apply_android(args: &Args) {
     // Apply / Move hosts file
     let move_to_etc_hosts = Command::new("adb")
         .stdout(Stdio::piped())
-        .args(["-s", &android_device, "shell", "su", "-c", "'mv", "/sdcard/hosts", "/etc/hosts'"])
+        .args([
+            "-s",
+            android_device,
+            "shell",
+            "su",
+            "-c",
+            "'mv",
+            "/sdcard/hosts",
+            "/etc/hosts'",
+        ])
         .status()
         .unwrap();
 
     if !move_to_etc_hosts.success() {
         println!(
             "{}error:{} Cannot apply the hosts file",
-            colors.bold_red,
-            colors.reset
+            colors.bold_red, colors.reset
         );
         exit(1);
     }
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
-        .args(["-s", &android_device, "shell", "su", "-c", "mount", "-o", "ro,remount", "/"])
+        .args([
+            "-s",
+            android_device,
+            "shell",
+            "su",
+            "-c",
+            "mount",
+            "-o",
+            "ro,remount",
+            "/",
+        ])
         .stdout(Stdio::piped())
         .status()
         .unwrap();
@@ -131,8 +170,7 @@ pub fn apply_android(args: &Args) {
     if !mount_system_as_ro.success() {
         println!(
             "{}error:{} Failed to mount the system as read only",
-            colors.bold_yellow,
-            colors.reset
+            colors.bold_yellow, colors.reset
         );
     }
 }

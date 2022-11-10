@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod networkmanager;
-pub mod systemd;
-pub mod runit;
-pub mod openrc;
 pub mod init;
+pub mod networkmanager;
+pub mod openrc;
+pub mod runit;
+pub mod systemd;

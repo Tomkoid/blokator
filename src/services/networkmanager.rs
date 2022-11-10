@@ -16,11 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use super::init::exists_networkmanager;
+use crate::get_init;
 use crate::initialize_colors::initialize_colors;
 use crate::services::init::restart_networkmanager_init;
-use super::init::exists_networkmanager;
 use crate::Messages;
-use crate::get_init;
 
 pub fn restart_networkmanager() {
     let colors = initialize_colors();
@@ -29,14 +29,13 @@ pub fn restart_networkmanager() {
     if exists_networkmanager() {
         print!(
             "{}==>{} Restarting NetworkManager..",
-            colors.bold_blue,
-            colors.reset
+            colors.bold_blue, colors.reset
         );
 
         let networkmanager_status = match restart_networkmanager_init() {
             Ok(s) => s,
-                Err(e) => panic!("couldn't restart NetworkManager: {e}")
-            };
+            Err(e) => panic!("couldn't restart NetworkManager: {e}"),
+        };
 
         if networkmanager_status.success() {
             println!(" {}done{}", colors.bold_green, colors.reset);
@@ -53,6 +52,14 @@ pub fn restart_networkmanager() {
             }
         }
     } else {
-       println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.message.get("networkmanager_restart_manually").unwrap());
+        println!(
+            "{}==>{} {}",
+            colors.bold_yellow,
+            colors.reset,
+            messages
+                .message
+                .get("networkmanager_restart_manually")
+                .unwrap()
+        );
     }
 }

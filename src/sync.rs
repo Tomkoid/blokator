@@ -16,12 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::{process::exit, path::Path};
-use crate::{write::write_to_file, get_data_dir, read::read_file_to_string, initialize_colors::initialize_colors};
 use crate::Args;
+use crate::{
+    get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
+    write::write_to_file,
+};
+use std::{path::Path, process::exit};
 
 pub fn sync(repo: &str, args: &Args) {
-    let colors = initialize_colors(); 
+    let colors = initialize_colors();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
@@ -31,13 +34,10 @@ pub fn sync(repo: &str, args: &Args) {
     } else if args.tor && repo.contains(".onion") {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
- 
+
     let response = client.build().unwrap().get(repo).send();
-    
-    let local_hosts = format!(
-        "{}/hosts",
-        get_data_dir()
-    );
+
+    let local_hosts = format!("{}/hosts", get_data_dir());
 
     let response = match response {
         Ok(s) => match s.text() {
@@ -45,20 +45,16 @@ pub fn sync(repo: &str, args: &Args) {
             Err(e) => {
                 println!(
                     "\n{}error:{} Failed to decode response: {}",
-                    colors.bold_red,
-                    colors.reset,
-                    e
+                    colors.bold_red, colors.reset, e
                 );
                 exit(1);
             }
-        }
+        },
         Err(e) => {
             if e.is_timeout() {
                 println!(
                     "\n{}error:{} Connection failed. (Check your internet connection): {}",
-                    colors.bold_red,
-                    colors.reset,
-                    e,
+                    colors.bold_red, colors.reset, e,
                 );
                 exit(1)
             } else if e.is_connect() {
@@ -72,9 +68,7 @@ pub fn sync(repo: &str, args: &Args) {
             } else {
                 println!(
                     "\n{}error:{} Error occurred: {}",
-                    colors.bold_red,
-                    colors.reset,
-                    e,
+                    colors.bold_red, colors.reset, e,
                 );
                 exit(1)
             }
@@ -82,7 +76,10 @@ pub fn sync(repo: &str, args: &Args) {
     };
 
     if Path::new(&local_hosts).exists() {
-        write_to_file(&local_hosts, read_file_to_string(&local_hosts).unwrap() + &response + "\n\n");
+        write_to_file(
+            &local_hosts,
+            read_file_to_string(&local_hosts).unwrap() + &response + "\n\n",
+        );
     } else {
         write_to_file(&local_hosts, response);
     }

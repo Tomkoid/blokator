@@ -21,50 +21,50 @@
 use clap::Parser;
 use dirs::home_dir;
 use std::fs;
-use std::process::exit;
-use std::path::Path;
 use std::io::Write;
-use std::sync::{ Arc, Mutex };
+use std::path::Path;
+use std::process::exit;
+use std::sync::{Arc, Mutex};
 
-pub mod read;
-pub mod write;
-pub mod messages;
-pub mod colors;
-mod copy;
-mod sync;
-mod services;
-mod initialize_dirs;
-mod initialize_colors;
-mod repos;
-mod handle_permissions;
-mod signal_handling;
 mod allowed_exit_functions;
 mod android;
 mod arguments;
+pub mod colors;
+mod copy;
+mod handle_permissions;
+mod initialize_colors;
+mod initialize_dirs;
+pub mod messages;
+pub mod read;
+mod repos;
+mod services;
+mod signal_handling;
+mod sync;
+pub mod write;
 
 #[cfg(target_family = "windows")]
 mod windows;
 
-use arguments::Args;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
 use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
+use arguments::Args;
 
+use crate::allowed_exit_functions::check_allowed_function;
+use crate::android::apply::apply_android;
 use crate::colors::Colors;
+use crate::copy::copy;
+use crate::handle_permissions::handle_permissions;
+use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
-use crate::initialize_dirs::{ already_initialized, initialize_dir };
-use crate::sync::sync;
-use crate::copy::copy;
-use crate::repos::{add_repo, list_repos, del_repo};
-use crate::handle_permissions::handle_permissions;
-use crate::signal_handling::handle_signals;
-use crate::allowed_exit_functions::check_allowed_function;
+use crate::repos::{add_repo, del_repo, list_repos};
 use crate::services::init::get_init;
-use crate::android::apply::apply_android;
+use crate::signal_handling::handle_signals;
+use crate::sync::sync;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -79,7 +79,7 @@ const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.bac
 #[derive(PartialEq, Eq)]
 pub enum Actions {
     Restore,
-    Backup, 
+    Backup,
     Apply,
 }
 
@@ -95,10 +95,10 @@ fn main() {
 
     // Initialize colors
     let colors = initialize_colors();
-    
+
     // Initialize messages
     let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
-    
+
     // Parse arguments
     let args = Args::parse();
 
@@ -138,18 +138,12 @@ fn main() {
     // Sync all repositories
     if args.sync {
         *state.lock().unwrap() = true;
-        let repos_file_location = format!(
-            "{}/repos",
-            get_data_dir()
-        );
+        let repos_file_location = format!("{}/repos", get_data_dir());
 
-        let local_hosts = format!(
-            "{}/hosts",
-            get_data_dir()
-        );
+        let local_hosts = format!("{}/hosts", get_data_dir());
 
         let local_hosts_output = read_file_to_string(&local_hosts).unwrap();
-        
+
         if Path::new(&local_hosts).exists() {
             fs::write(&local_hosts, "").unwrap();
         }
@@ -158,8 +152,7 @@ fn main() {
         if repos.trim().is_empty() {
             println!(
                 "  [{}*{}] There are no repos to sync.",
-                colors.bold_blue,
-                colors.reset
+                colors.bold_blue, colors.reset
             );
             exit(1);
         }
@@ -170,9 +163,7 @@ fn main() {
 
             print!(
                 "  [{}*{}] Syncing {}.. ",
-                colors.bold_blue,
-                colors.reset,
-                repo,
+                colors.bold_blue, colors.reset, repo,
             );
 
             std::io::stdout().flush().unwrap();
@@ -194,14 +185,12 @@ fn main() {
         if changed {
             println!(
                 "  [{}+{}] Synced all repos successfully.",
-                colors.bold_green,
-                colors.reset
+                colors.bold_green, colors.reset
             );
         } else {
             println!(
                 "  [{}-{}] Nothing changed.",
-                colors.bold_yellow,
-                colors.reset
+                colors.bold_yellow, colors.reset
             );
         }
         *state.lock().unwrap() = false;
@@ -211,7 +200,12 @@ fn main() {
     if args.backup {
         *state.lock().unwrap() = true;
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
-        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("created_backup").unwrap());
+        println!(
+            "{}==>{} {}",
+            colors.bold_green,
+            colors.reset,
+            messages.message.get("created_backup").unwrap()
+        );
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -228,13 +222,25 @@ fn main() {
             );
             exit(1);
         }
-        if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap() == read_file_to_string(HOSTS_FILE).unwrap() {
-            println!("{}==>{} {}", colors.bold_yellow, colors.reset, messages.message.get("backup_already_restored").unwrap());
+        if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap()
+            == read_file_to_string(HOSTS_FILE).unwrap()
+        {
+            println!(
+                "{}==>{} {}",
+                colors.bold_yellow,
+                colors.reset,
+                messages.message.get("backup_already_restored").unwrap()
+            );
             exit(1);
         }
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         restart_networkmanager();
-        println!("{}==>{} {}", colors.bold_green, colors.reset, messages.message.get("backup_restored").unwrap());
+        println!(
+            "{}==>{} {}",
+            colors.bold_green,
+            colors.reset,
+            messages.message.get("backup_restored").unwrap()
+        );
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -242,34 +248,56 @@ fn main() {
     // Apply changes
     if args.apply {
         *state.lock().unwrap() = true;
-        let local_hosts = format!(
-            "{}/hosts",
-            get_data_dir()
-        );
+        let local_hosts = format!("{}/hosts", get_data_dir());
         if !Path::new(&local_hosts).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("local_hosts_missing").unwrap());
-            println!("  {}Help:{} {}", colors.bold_green, colors.reset, messages.help_message.get("local_hosts_missing").unwrap());
+            println!(
+                "  [{}*{}] {}",
+                colors.bold_red,
+                colors.reset,
+                messages.message.get("local_hosts_missing").unwrap()
+            );
+            println!(
+                "  {}Help:{} {}",
+                colors.bold_green,
+                colors.reset,
+                messages.help_message.get("local_hosts_missing").unwrap()
+            );
             exit(1);
         } else if !Path::new(HOSTS_FILE).exists() {
-            println!("  [{}*{}] {}", colors.bold_red, colors.reset, messages.message.get("etc_hosts_missing").unwrap());
+            println!(
+                "  [{}*{}] {}",
+                colors.bold_red,
+                colors.reset,
+                messages.message.get("etc_hosts_missing").unwrap()
+            );
             exit(1);
         }
         if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-            println!("  [{}*{}] {}", colors.bold_yellow, colors.reset, messages.message.get("already_applied").unwrap());
+            println!(
+                "  [{}*{}] {}",
+                colors.bold_yellow,
+                colors.reset,
+                messages.message.get("already_applied").unwrap()
+            );
             exit(1);
         }
-               
+
         if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
             // Backup /etc/hosts to /etc/hosts.backup
-            copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup); 
+            copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
         }
 
         // Rewrite /etc/hosts
         copy(&local_hosts, HOSTS_FILE, Actions::Apply);
-        
+
         restart_networkmanager();
 
-        println!("   {}>{} {}", colors.bold_green, colors.reset, messages.message.get("adblocker_started").unwrap());
+        println!(
+            "   {}>{} {}",
+            colors.bold_green,
+            colors.reset,
+            messages.message.get("adblocker_started").unwrap()
+        );
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -296,21 +324,28 @@ fn main() {
         *state.lock().unwrap() = true;
         list_devices();
         *state.lock().unwrap() = false;
-        
+
         exit(0);
     }
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
 
-    println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("no_action_specified").unwrap());
-    println!("{}HELP:{} {}", colors.bold_green, colors.reset, messages.help_message.get("no_action_specified").unwrap());
+    println!(
+        "{}error:{} {}",
+        colors.bold_red,
+        colors.reset,
+        messages.message.get("no_action_specified").unwrap()
+    );
+    println!(
+        "{}HELP:{} {}",
+        colors.bold_green,
+        colors.reset,
+        messages.help_message.get("no_action_specified").unwrap()
+    );
     exit(1);
 }
 
 pub fn get_data_dir() -> String {
-    format!(
-        "{}/.local/share/adblocker",
-        home_dir().unwrap().display()
-    )
+    format!("{}/.local/share/adblocker", home_dir().unwrap().display())
 }

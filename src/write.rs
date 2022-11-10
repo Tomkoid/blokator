@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::process::exit;
 use std::fs;
+use std::process::exit;
 
 use crate::initialize_colors::initialize_colors;
 

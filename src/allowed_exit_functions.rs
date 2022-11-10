@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::process::exit;
 use crate::Args;
+use std::process::exit;
 
 pub fn check_allowed_function(args: &Args) {
     if args.sync {

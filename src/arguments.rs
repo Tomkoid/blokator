@@ -19,7 +19,12 @@
 use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
-#[clap(author = "Tomáš Zierl", version, about, long_about = "Easy system-wide adblocker")]
+#[clap(
+    author = "Tomáš Zierl",
+    version,
+    about,
+    long_about = "Easy system-wide adblocker"
+)]
 pub struct Args {
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]

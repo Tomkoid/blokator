@@ -16,15 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::{thread, sync::Arc, sync::Mutex};
-use std::process::exit;
 use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
+use std::process::exit;
+use std::{sync::Arc, sync::Mutex, thread};
 
 use crate::initialize_colors::initialize_colors;
 
 // Signal handling (ex: CTRL + c)
 pub fn handle_signals(thread_state: Arc<Mutex<bool>>) {
-    let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
+    let mut signals = Signals::new([SIGTERM, SIGINT]).unwrap();
 
     thread::spawn(move || {
         let mut already_pressed = false;
@@ -50,5 +50,4 @@ pub fn handle_signals(thread_state: Arc<Mutex<bool>>) {
             exit(1);
         }
     });
-
 }

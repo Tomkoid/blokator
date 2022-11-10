@@ -46,7 +46,7 @@ pub fn is_elevated() -> bool {
             &mut ret_size,
         )
     };
-    let elevation_struct: TOKEN_ELEVATION = unsafe{ *(elevation as *mut TOKEN_ELEVATION)};
+    let elevation_struct: TOKEN_ELEVATION = unsafe { *(elevation as *mut TOKEN_ELEVATION) };
 
     if !handle.is_null() {
         unsafe {
@@ -55,5 +55,4 @@ pub fn is_elevated() -> bool {
     }
 
     elevation_struct.TokenIsElevated == 1
-
 }

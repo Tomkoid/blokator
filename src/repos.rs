@@ -16,13 +16,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::process::exit;
-use std::path::Path;
 use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
 use crate::write::write_to_file;
 use crate::Args;
+use std::path::Path;
+use std::process::exit;
 
 fn verify_repo(repo: &String, args: &Args) {
     let colors = initialize_colors();
@@ -30,29 +30,29 @@ fn verify_repo(repo: &String, args: &Args) {
     let mut client = reqwest::blocking::ClientBuilder::new();
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
- 
+
     if args.tor_all {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
     } else if args.tor && repo.contains(".onion") {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
-    client.build().unwrap().get(repo).send().unwrap_or_else(|e| {
-        println!(
-            "{}error:{} Failed to connect to the repo: {}",
-            colors.bold_red,
-            colors.reset,
-            e, 
-        );
-        exit(1)
-    });
+    client
+        .build()
+        .unwrap()
+        .get(repo)
+        .send()
+        .unwrap_or_else(|e| {
+            println!(
+                "{}error:{} Failed to connect to the repo: {}",
+                colors.bold_red, colors.reset, e,
+            );
+            exit(1)
+        });
 }
 
 pub fn list_repos() -> Vec<String> {
-    let repos_file_location = format!(
-        "{}/repos",
-        get_data_dir()
-    );
+    let repos_file_location = format!("{}/repos", get_data_dir());
 
     let mut repos = "".to_string();
     if Path::new(&repos_file_location).exists() {
@@ -81,8 +81,7 @@ pub fn add_repo(repo: &String, args: &Args) {
         if i == repo {
             println!(
                 "{}error:{} The repo you're trying to add already exists in repos list.",
-                colors.bold_red,
-                colors.reset
+                colors.bold_red, colors.reset
             );
             exit(1);
         }
@@ -97,26 +96,21 @@ pub fn add_repo(repo: &String, args: &Args) {
 
     println!(
         "{}success:{} Added and verified the repo.",
-        colors.bold_green,
-        colors.reset
+        colors.bold_green, colors.reset
     );
 }
 
 pub fn del_repo(repo: String) {
     let colors = initialize_colors();
 
-    let repos_file_location = format!(
-        "{}/repos",
-        get_data_dir()
-    );
+    let repos_file_location = format!("{}/repos", get_data_dir());
 
     if Path::new(&repos_file_location).exists() {
         let mut repos = read_file_to_string(&repos_file_location).unwrap();
         if !repos.contains(&repo) {
             println!(
                 "{}error:{} The repo you're trying to delete doesn't exist",
-                colors.bold_red,
-                colors.reset
+                colors.bold_red, colors.reset
             );
             exit(1);
         }
@@ -124,9 +118,7 @@ pub fn del_repo(repo: String) {
         write_to_file(&repos_file_location, repos);
         println!(
             "{}success:{} Deleted {} from the repo list.",
-            colors.bold_green,
-            colors.reset,
-            repo
+            colors.bold_green, colors.reset, repo
         );
     } else {
         println!(

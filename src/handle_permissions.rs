@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use std::process::exit;
 use crate::initialize_colors;
+use std::process::exit;
 
 use crate::Messages;
 
@@ -34,13 +34,23 @@ pub fn handle_permissions() {
     // Check if the program is running with root permissions
     #[cfg(target_family = "unix")]
     if !Uid::effective().is_root() {
-        println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("root_is_required").unwrap());
+        println!(
+            "{}error:{} {}",
+            colors.bold_red,
+            colors.reset,
+            messages.message.get("root_is_required").unwrap()
+        );
         exit(1);
     }
 
     #[cfg(target_family = "windows")]
     if !is_elevated() {
-        println!("{}error:{} {}", colors.bold_red, colors.reset, messages.message.get("root_is_required").unwrap());
+        println!(
+            "{}error:{} {}",
+            colors.bold_red,
+            colors.reset,
+            messages.message.get("root_is_required").unwrap()
+        );
         exit(1);
     }
 }

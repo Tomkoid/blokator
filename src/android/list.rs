@@ -34,7 +34,9 @@ pub fn list_devices() {
     let devices_output = String::from_utf8(devices.stdout).unwrap();
 
     let mut lines: i32 = 0;
-    for _ in devices_output.lines() { lines += 1; }
+    for _ in devices_output.lines() {
+        lines += 1;
+    }
 
     if lines == 2 {
         println!("No device found");
@@ -44,15 +46,23 @@ pub fn list_devices() {
     println!("DEVICE ID\tSTATE");
 
     for (index, line) in devices_output.lines().enumerate() {
-        if index == 0 { continue; }
-        if line.is_empty() { continue; }
+        if index == 0 {
+            continue;
+        }
+        if line.is_empty() {
+            continue;
+        }
 
         let mut device_id = "";
         let mut device_state = "";
 
-        for (index, section) in line.split("\t").enumerate() {
-            if index == 0 { device_id = section; }
-            if index == 1 { device_state = section; }
+        for (index, section) in line.split('\t').enumerate() {
+            if index == 0 {
+                device_id = section;
+            }
+            if index == 1 {
+                device_state = section;
+            }
         }
 
         println!("{device_id}\t{device_state}");
