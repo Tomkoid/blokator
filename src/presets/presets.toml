@@ -1,0 +1,3 @@
+[preset]
+adaway = "https://adaway.org/hosts.txt"
+stevenblack = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"

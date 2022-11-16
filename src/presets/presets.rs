@@ -1,4 +1,4 @@
-// messages.rs
+// presets/presets.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
@@ -15,20 +15,40 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::process::exit;
+use crate::initialize_colors;
+use crate::messages::Messages;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Messages {
-    pub message: HashMap<String, String>,
-    pub help_message: HashMap<String, String>,
-    pub restore_message: HashMap<String, String>,
-    pub backup_message: HashMap<String, String>,
-    pub apply_message: HashMap<String, String>,
+pub struct Presets {
+    pub preset: HashMap<String, String>
 }
 
-impl Messages {
+impl Presets {
     pub fn new() -> Self {
-        toml::from_str(include_str!("messages/messages.toml")).unwrap()
+        toml::from_str(include_str!("presets.toml")).unwrap()
+    }
+    
+    pub fn get(query: String) -> String {
+        let messages = Messages::new();
+        let colors = initialize_colors();
+        let presets = Self::new();
+        
+        let preset_url = presets.preset.get(&query);
+        
+        if presets.preset.get(&query) == None {
+            println!(
+                "  {}>{} {}",
+                colors.bold_red,
+                colors.reset,
+                messages.message.get("preset_notfound").unwrap()
+            );
+            exit(1)
+        } else {
+            preset_url.unwrap().to_string()
+        }
     }
 }

@@ -41,6 +41,7 @@ mod services;
 mod signal_handling;
 mod sync;
 pub mod write;
+pub mod presets;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -48,6 +49,7 @@ mod windows;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
+use crate::presets::presets::Presets;
 use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
@@ -120,9 +122,18 @@ fn main() {
     }
 
     // Add repo
-    if args.add_repo != "none" {
+    if args.add_repo != None {
         *state.lock().unwrap() = true;
-        add_repo(&args.add_repo, &args);
+        add_repo(&args.add_repo.clone().unwrap(), &args);
+        *state.lock().unwrap() = false;
+        exit(0);
+    }
+    
+    // Add repo from preset
+    if args.add_repo_preset != None {
+        *state.lock().unwrap() = true;
+        let repo = Presets::get(args.add_repo_preset.clone().unwrap());
+        add_repo(&repo, &args);
         *state.lock().unwrap() = false;
         exit(0);
     }
@@ -135,6 +146,15 @@ fn main() {
         exit(0);
     }
 
+    // Delete repo from preset
+    if args.del_repo_preset != None {
+        *state.lock().unwrap() = true;
+        let repo = Presets::get(args.del_repo_preset.clone().unwrap());
+        del_repo(repo);
+        *state.lock().unwrap() = false;
+        exit(0);
+    }
+    
     // Sync all repositories
     if args.sync {
         *state.lock().unwrap() = true;
@@ -322,10 +342,7 @@ fn main() {
             "  {}>{} {}",
             colors.bold_green,
             colors.reset,
-            messages
-                .message
-                .get("adblocker_started_no_networkmanager")
-                .unwrap()
+            messages.message.get("adblocker_started_no_networkmanager").unwrap()
         );
         *state.lock().unwrap() = false;
         exit(0);

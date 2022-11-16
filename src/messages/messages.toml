@@ -20,6 +20,7 @@ syncing = "Syncing"
 no_repos_to_sync = "There are no repos to sync."
 permission_denied = "Permission Denied"
 unknown_error = "Error occurred"
+preset_notfound = "Preset by this name was not found."
 
 [help_message]
 local_hosts_missing = "run blokator with `--sync` argument."
