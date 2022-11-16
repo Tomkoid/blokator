@@ -26,7 +26,11 @@ All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 
 \f[B]-m, --add-repo [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository
 
+\f[B]-M, --add-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository from preset
+
 \f[B]-d, --del-repo [RAW HOSTS FILE TXT URL]\f[R] - remove additonal repository
+
+\f[B]-D, --del-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository from preset
 .SH ANDROID_OPTIONS (required)
 \f[B]--android-device [DEVICE_ID]\f[R] - specify android device
 .SH DOWNLOAD_OPTIONS (optional)
