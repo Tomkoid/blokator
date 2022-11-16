@@ -28,7 +28,7 @@ pub fn restart_networkmanager() {
 
     if exists_networkmanager() {
         print!(
-            "{}==>{} Restarting NetworkManager..",
+            "{}  >{} Restarting NetworkManager..",
             colors.bold_blue, colors.reset
         );
 

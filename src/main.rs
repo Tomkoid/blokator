@@ -97,7 +97,7 @@ fn main() {
     let colors = initialize_colors();
 
     // Initialize messages
-    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
+    let messages: Messages = Messages::new();
 
     // Parse arguments
     let args = Args::parse();
@@ -151,8 +151,10 @@ fn main() {
         let repos = read_file_to_string(&repos_file_location).unwrap();
         if repos.trim().is_empty() {
             println!(
-                "  [{}*{}] There are no repos to sync.",
-                colors.bold_blue, colors.reset
+                "  [{}*{}] {}",
+                colors.bold_blue,
+                colors.reset,
+                messages.message.get("no_repos_to_sync").unwrap()
             );
             exit(1);
         }
@@ -162,8 +164,11 @@ fn main() {
             }
 
             print!(
-                "  [{}*{}] Syncing {}.. ",
-                colors.bold_blue, colors.reset, repo,
+                "  [{}*{}] {} {}.. ",
+                colors.bold_blue,
+                colors.reset,
+                messages.message.get("syncing").unwrap(),
+                repo,
             );
 
             std::io::stdout().flush().unwrap();
@@ -184,13 +189,17 @@ fn main() {
 
         if changed {
             println!(
-                "  [{}+{}] Synced all repos successfully.",
-                colors.bold_green, colors.reset
+                "  [{}+{}] {}",
+                colors.bold_yellow,
+                colors.reset,
+                messages.message.get("synced_successfully").unwrap()
             );
         } else {
             println!(
-                "  [{}-{}] Nothing changed.",
-                colors.bold_yellow, colors.reset
+                "  [{}-{}] {}",
+                colors.bold_yellow,
+                colors.reset,
+                messages.message.get("nothing_changed").unwrap()
             );
         }
         *state.lock().unwrap() = false;
@@ -201,7 +210,7 @@ fn main() {
         *state.lock().unwrap() = true;
         copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
         println!(
-            "{}==>{} {}",
+            "  {}>{} {}",
             colors.bold_green,
             colors.reset,
             messages.message.get("created_backup").unwrap()
@@ -215,7 +224,7 @@ fn main() {
         *state.lock().unwrap() = true;
         if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
             println!(
-                "{}==>{} {}",
+                "  {}>{} {}",
                 colors.bold_red,
                 colors.reset,
                 messages.restore_message.get("not_found").unwrap()
@@ -226,7 +235,7 @@ fn main() {
             == read_file_to_string(HOSTS_FILE).unwrap()
         {
             println!(
-                "{}==>{} {}",
+                "  {}>{} {}",
                 colors.bold_yellow,
                 colors.reset,
                 messages.message.get("backup_already_restored").unwrap()
@@ -236,7 +245,7 @@ fn main() {
         copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
         restart_networkmanager();
         println!(
-            "{}==>{} {}",
+            "  {}>{} {}",
             colors.bold_green,
             colors.reset,
             messages.message.get("backup_restored").unwrap()
@@ -293,7 +302,7 @@ fn main() {
         restart_networkmanager();
 
         println!(
-            "   {}>{} {}",
+            "  {}>{} {}",
             colors.bold_green,
             colors.reset,
             messages.message.get("adblocker_started").unwrap()
@@ -310,9 +319,10 @@ fn main() {
 
         apply_android(&args);
         println!(
-            "   {}>{} Started the adblocker, but you must reboot or restart your wifi adapter to see the changes",
+            "  {}>{} {}",
             colors.bold_green,
-            colors.reset
+            colors.reset,
+            messages.message.get("adblocker_started_no_networkmanager").unwrap()
         );
         *state.lock().unwrap() = false;
         exit(0);

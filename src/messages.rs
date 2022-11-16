@@ -9,3 +9,9 @@ pub struct Messages {
     pub backup_message: HashMap<String, String>,
     pub apply_message: HashMap<String, String>,
 }
+
+impl Messages {
+    pub fn new() -> Self {
+        toml::from_str(include_str!("messages/messages.toml")).unwrap()
+    }
+}
