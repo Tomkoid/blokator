@@ -39,7 +39,7 @@ impl Presets {
         
         let preset_url = presets.preset.get(&query);
         
-        if presets.preset.get(&query) == None {
+        if presets.preset.get(&query).is_none() {
             println!(
                 "  {}>{} {}",
                 colors.bold_red,
@@ -50,5 +50,11 @@ impl Presets {
         } else {
             preset_url.unwrap().to_string()
         }
+    }
+}
+
+impl Default for Presets {
+    fn default() -> Self {
+        Self::new()
     }
 }

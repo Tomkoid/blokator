@@ -15,6 +15,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -30,5 +31,11 @@ pub struct Messages {
 impl Messages {
     pub fn new() -> Self {
         toml::from_str(include_str!("messages/messages.toml")).unwrap()
+    }
+}
+
+impl Default for Messages {
+    fn default() -> Self {
+        Self::new()
     }
 }

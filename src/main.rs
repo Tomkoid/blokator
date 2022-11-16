@@ -122,7 +122,7 @@ fn main() {
     }
 
     // Add repo
-    if args.add_repo != None {
+    if args.add_repo.is_some() {
         *state.lock().unwrap() = true;
         add_repo(&args.add_repo.clone().unwrap(), &args);
         *state.lock().unwrap() = false;
@@ -130,7 +130,7 @@ fn main() {
     }
     
     // Add repo from preset
-    if args.add_repo_preset != None {
+    if args.add_repo_preset.is_some() {
         *state.lock().unwrap() = true;
         let repo = Presets::get(args.add_repo_preset.clone().unwrap());
         add_repo(&repo, &args);
@@ -147,9 +147,9 @@ fn main() {
     }
 
     // Delete repo from preset
-    if args.del_repo_preset != None {
+    if args.del_repo_preset.is_some() {
         *state.lock().unwrap() = true;
-        let repo = Presets::get(args.del_repo_preset.clone().unwrap());
+        let repo = Presets::get(args.del_repo_preset.unwrap());
         del_repo(repo);
         *state.lock().unwrap() = false;
         exit(0);
