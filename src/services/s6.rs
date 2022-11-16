@@ -1,4 +1,4 @@
-// services/mod.rs
+// services/openrc.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
@@ -16,9 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod init;
-pub mod networkmanager;
-pub mod openrc;
-pub mod runit;
-pub mod s6;
-pub mod systemd;
+use std::process::Command;
+
+pub fn networkmanager_s6_restart() -> Result<std::process::ExitStatus, std::io::Error> {
+    let _ = Command::new("s6-rc")
+        .args(["-d", "change", "NetworkManager"])
+        .status();
+    
+    Command::new("s6-rc")
+        .args(["-u", "change", "NetworkManager"])
+        .status()
+}
