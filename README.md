@@ -26,6 +26,7 @@ Blokator can run basically everywhere. These are the tested platforms:
 - SystemD
 - Runit
 - OpenRC
+- s6
 
 If you have another init system or networking service, you can restart it manually or even reboot the computer.
 
@@ -81,15 +82,9 @@ You can install **Blokator** easily with Cargo package manager:
 cargo install blokator
 ```
 
-or if you want Android support: (not recommended yet)
-
-```
-cargo install blokator --features android
-```
-
 **MAKE SURE THAT `~/.cargo/bin` IS IN YOUR `$PATH`**
 
-#### With Git
+#### With Git and Make
 First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to your local machine:
 
 ```
@@ -106,12 +101,6 @@ In that directory you can build **Blokator** using **make**:
 
 ```
 make build
-```
-
-or if you want Android support (experimental):
-
-```
-cargo build --release --features android
 ```
 
 And install it to the system:
