@@ -35,13 +35,13 @@ mod handle_permissions;
 mod initialize_colors;
 mod initialize_dirs;
 pub mod messages;
+pub mod presets;
 pub mod read;
 mod repos;
 mod services;
 mod signal_handling;
 mod sync;
 pub mod write;
-pub mod presets;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -128,7 +128,7 @@ fn main() {
         *state.lock().unwrap() = false;
         exit(0);
     }
-    
+
     // Add repo from preset
     if args.add_repo_preset.is_some() {
         *state.lock().unwrap() = true;
@@ -154,7 +154,7 @@ fn main() {
         *state.lock().unwrap() = false;
         exit(0);
     }
-    
+
     // Sync all repositories
     if args.sync {
         *state.lock().unwrap() = true;
@@ -342,7 +342,10 @@ fn main() {
             "  {}>{} {}",
             colors.bold_green,
             colors.reset,
-            messages.message.get("adblocker_started_no_networkmanager").unwrap()
+            messages
+                .message
+                .get("adblocker_started_no_networkmanager")
+                .unwrap()
         );
         *state.lock().unwrap() = false;
         exit(0);

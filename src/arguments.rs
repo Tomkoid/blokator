@@ -65,15 +65,15 @@ pub struct Args {
     /// Delete specified repo from the repo list
     #[clap(short, long, value_parser, default_value = "none")]
     pub del_repo: String,
-    
+
     /// Add repo from preset
     #[clap(short = 'M', long, value_parser)]
     pub add_repo_preset: Option<String>,
-    
+
     /// Delete repo from preset
     #[clap(short = 'D', long, value_parser)]
-    pub del_repo_preset: Option<String>,  
-    
+    pub del_repo_preset: Option<String>,
+
     /// Use TOR proxy for making requests
     #[clap(short, long, value_parser, default_value_t = false)]
     pub tor: bool,

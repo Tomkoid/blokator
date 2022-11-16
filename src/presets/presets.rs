@@ -16,29 +16,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::initialize_colors;
+use crate::messages::Messages;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::process::exit;
-use crate::initialize_colors;
-use crate::messages::Messages;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Presets {
-    pub preset: HashMap<String, String>
+    pub preset: HashMap<String, String>,
 }
 
 impl Presets {
     pub fn new() -> Self {
         toml::from_str(include_str!("presets.toml")).unwrap()
     }
-    
+
     pub fn get(query: String) -> String {
         let messages = Messages::new();
         let colors = initialize_colors();
         let presets = Self::new();
-        
+
         let preset_url = presets.preset.get(&query);
-        
+
         if presets.preset.get(&query).is_none() {
             println!(
                 "  {}>{} {}",
