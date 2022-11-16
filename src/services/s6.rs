@@ -19,11 +19,7 @@
 use std::process::Command;
 
 pub fn networkmanager_s6_restart() -> Result<std::process::ExitStatus, std::io::Error> {
-    let _ = Command::new("s6-rc")
-        .args(["-d", "change", "NetworkManager"])
-        .status();
-    
-    Command::new("s6-rc")
-        .args(["-u", "change", "NetworkManager"])
+   Command::new("s6-svc")
+        .args(["-r", "/run/service/NetworkManager-srv"])
         .status()
 }
