@@ -24,7 +24,7 @@ use crate::Messages;
 
 pub fn restart_networkmanager() {
     let colors = initialize_colors();
-    let messages: Messages = toml::from_str(include_str!("../messages/messages.toml")).unwrap();
+    let messages: Messages = Messages::new();
 
     if exists_networkmanager() {
         print!(

@@ -322,7 +322,10 @@ fn main() {
             "  {}>{} {}",
             colors.bold_green,
             colors.reset,
-            messages.message.get("adblocker_started_no_networkmanager").unwrap()
+            messages
+                .message
+                .get("adblocker_started_no_networkmanager")
+                .unwrap()
         );
         *state.lock().unwrap() = false;
         exit(0);

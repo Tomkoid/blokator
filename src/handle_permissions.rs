@@ -29,7 +29,7 @@ use crate::is_elevated;
 
 pub fn handle_permissions() {
     let colors = initialize_colors();
-    let messages: Messages = toml::from_str(include_str!("messages/messages.toml")).unwrap();
+    let messages: Messages = Messages::new();
 
     // Check if the program is running with root permissions
     #[cfg(target_family = "unix")]
