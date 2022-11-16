@@ -10,6 +10,9 @@ Cargo.lock
 # Binaries in AppImage /usr/bin
 packages/Blokator.AppDir/usr/bin/blokator
 
+# Generated man page zips
+man-pages/blokator.1*
+
 # Pacman auto generated files
 packages/archlinux/*.pkg.tar.zst
 packages/archlinux/*.pkg.tar.zst.sig
