@@ -20,11 +20,15 @@ use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
 
+use crate::initialize_colors::initialize_colors;
+
 use super::checks::adb_exists;
 
 pub fn list_devices() {
+    let colors = initialize_colors();
+    
     adb_exists();
-
+    
     let devices = Command::new("adb")
         .stdout(Stdio::piped())
         .arg("devices")
@@ -43,7 +47,7 @@ pub fn list_devices() {
         exit(1);
     }
 
-    println!("DEVICE ID\tSTATE");
+    println!("DEVICE ID");
 
     for (index, line) in devices_output.lines().enumerate() {
         if index == 0 {
@@ -65,6 +69,21 @@ pub fn list_devices() {
             }
         }
 
-        println!("{device_id}\t{device_state}");
+        let get_device_model = Command::new("adb")
+            .args(["-s", device_id, "shell", "getprop", "ro.product.model"])
+            .stdout(Stdio::piped())
+            .output()
+            .unwrap();
+
+        let device_model = String::from_utf8(get_device_model.stdout).unwrap();
+
+        println!(
+            "{}{device_id}{} {}({}, in {device_state} state){}",
+            colors.bold_white,
+            colors.reset,
+            colors.bold_gray,
+            device_model.trim(),
+            colors.reset
+        );
     }
 }

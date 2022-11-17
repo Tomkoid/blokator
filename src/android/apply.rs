@@ -16,7 +16,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+use crate::messages::Messages;
 use crate::Args;
+use std::io::Write;
 use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
@@ -27,6 +29,25 @@ use crate::initialize_colors::initialize_colors;
 use super::checks::adb_exists;
 use super::checks::device_ready;
 
+pub fn print_done() {
+    let colors = initialize_colors();
+
+    println!(" {}done{}", colors.bold_green, colors.reset);
+}
+
+pub fn print_msg(query_msg: &str) {
+    let colors = initialize_colors();
+    let messages = Messages::new();
+
+    print!(
+        "  [{}*{}] {} ",
+        colors.bold_blue,
+        colors.reset,
+        messages.message.get(query_msg).unwrap()
+    );
+    std::io::stdout().flush().unwrap();
+}
+
 pub fn apply_android(args: &Args) {
     let colors = initialize_colors();
 
@@ -34,7 +55,7 @@ pub fn apply_android(args: &Args) {
         Some(value) => value,
         None => {
             println!(
-                "{}error:{} No device was specified\n{}HELP:{} try to specify device with `--android-device <device ID>`, list devices with `--list-devices` argument",
+                "  {}error:{} No device was specified\n{}HELP:{} try to specify device with `--android-device <device ID>`, list devices with `--list-devices` argument",
                 colors.bold_red,
                 colors.reset,
                 colors.bold_green,
@@ -49,12 +70,14 @@ pub fn apply_android(args: &Args) {
         true => {}
         false => {
             println!(
-                "{}error:{} Device is not ready.",
+                "  {}error:{} Device is not ready.",
                 colors.bold_red, colors.reset
             );
             exit(1)
         }
     }
+
+    print_msg("android_mounting_rw");
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
@@ -69,17 +92,21 @@ pub fn apply_android(args: &Args) {
             "rw,remount",
             "/",
         ])
-        .stdout(Stdio::piped())
+        .stdout(Stdio::null())
         .status()
         .unwrap();
 
     if !mount_system_as_rw.success() {
         println!(
-            "{}error:{} Failed to mount system as read & write",
+            "  {}error:{} Failed to mount system as read & write",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
+
+    print_done();
+
+    print_msg("android_temp_push");
 
     // Push temporary hosts file to /sdcard/hosts
     let push_sdcard = Command::new("adb")
@@ -96,11 +123,15 @@ pub fn apply_android(args: &Args) {
 
     if !push_sdcard.success() {
         println!(
-            "{}error:{} Cannot push the hosts file to the Android device",
+            "  {}error:{} Cannot push the hosts file to the Android device",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
+
+    print_done();
+
+    print_msg("android_backup_create");
 
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
@@ -120,11 +151,15 @@ pub fn apply_android(args: &Args) {
 
     if !copy_etc_hosts.success() {
         println!(
-            "{}error:{} Cannot make a backup of the hosts file",
+            "  {}error:{} Cannot make a backup of the hosts file",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
+
+    print_done();
+
+    print_msg("android_apply_hosts");
 
     // Apply / Move hosts file
     let move_to_etc_hosts = Command::new("adb")
@@ -144,11 +179,15 @@ pub fn apply_android(args: &Args) {
 
     if !move_to_etc_hosts.success() {
         println!(
-            "{}error:{} Cannot apply the hosts file",
+            "  {}error:{} Cannot apply the hosts file",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
+
+    print_done();
+
+    print_msg("android_mounting_ro");
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
@@ -169,8 +208,10 @@ pub fn apply_android(args: &Args) {
 
     if !mount_system_as_ro.success() {
         println!(
-            "{}error:{} Failed to mount the system as read only",
+            "  {}error:{} Failed to mount the system as read only",
             colors.bold_yellow, colors.reset
         );
     }
+
+    print_done();
 }
