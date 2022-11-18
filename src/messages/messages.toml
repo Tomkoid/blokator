@@ -26,6 +26,7 @@ android_temp_push = "Pushing temporary hosts file to /sdcard/hosts.."
 android_backup_create = "Creating a backup of current hosts file.."
 android_apply_hosts = "Applying modified hosts file.."
 android_mounting_ro = "Mounting root back as read only.."
+android_send_message = "Trying to send notification to Android device.."
 
 [help_message]
 local_hosts_missing = "run blokator with `--sync` argument."
