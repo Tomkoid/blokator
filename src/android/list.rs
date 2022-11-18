@@ -75,8 +75,12 @@ pub fn list_devices() {
             .output()
             .unwrap();
 
-        let device_model = String::from_utf8(get_device_model.stdout).unwrap();
+        let mut device_model = String::from_utf8(get_device_model.stdout).unwrap();
 
+        if device_model.is_empty() {
+            device_model = "unknown model".to_string();
+        }
+        
         println!(
             "{}{device_id}{} {}({}, in {device_state} state){}",
             colors.bold_white,
