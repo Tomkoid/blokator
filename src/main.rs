@@ -49,7 +49,7 @@ mod windows;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
-use crate::presets::presets::Presets;
+use crate::presets::preset::Presets;
 use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;

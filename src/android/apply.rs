@@ -241,7 +241,7 @@ pub fn apply_android(args: &Args) {
     print_msg("android_send_message");
 
     // If send_notification was unsuccessful
-    if !send_notification(&android_device) {
+    if !send_notification(android_device) {
         println!(" {}error{}", colors.bold_yellow, colors.reset);
         exit(0);
     }
