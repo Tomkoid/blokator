@@ -48,6 +48,29 @@ pub fn print_msg(query_msg: &str) {
     std::io::stdout().flush().unwrap();
 }
 
+// Send notification and return bool with success state
+pub fn send_notification(android_device: &String) -> bool {
+    let result = Command::new("adb")
+        .args([
+            "-s",
+            android_device,
+            "shell",
+            "cmd",
+            "notification",
+            "post",
+            "-t",
+            "'Blokator'",
+            "'Blokator'",
+            r"'Successfully applied'",
+        ])
+        .stderr(Stdio::null())
+        .stdout(Stdio::null())
+        .status()
+        .unwrap();
+
+    result.success()
+}
+
 pub fn apply_android(args: &Args) {
     let colors = initialize_colors();
 
@@ -211,6 +234,16 @@ pub fn apply_android(args: &Args) {
             "  {}error:{} Failed to mount the system as read only",
             colors.bold_yellow, colors.reset
         );
+    }
+
+    print_done();
+
+    print_msg("android_send_message");
+
+    // If send_notification was unsuccessful
+    if !send_notification(&android_device) {
+        println!(" {}error{}", colors.bold_yellow, colors.reset);
+        exit(0);
     }
 
     print_done();
