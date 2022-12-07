@@ -67,6 +67,7 @@ use crate::repos::{add_repo, del_repo, list_repos};
 use crate::services::init::get_init;
 use crate::signal_handling::handle_signals;
 use crate::sync::sync;
+use crate::write::write_to_file;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -159,6 +160,7 @@ fn main() {
     if args.sync {
         *state.lock().unwrap() = true;
         let repos_file_location = format!("{}/repos", get_data_dir());
+        let hosts_temp = "/tmp/blokator".to_string();
 
         let local_hosts = format!("{}/hosts", get_data_dir());
 
@@ -207,12 +209,23 @@ fn main() {
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
 
+        #[cfg(target_os = "linux")]
+        write_to_file(&hosts_temp, read_file_to_string(&local_hosts).unwrap());
+
         if changed {
             println!(
                 "  [{}+{}] {}",
-                colors.bold_yellow,
+                colors.bold_green,
                 colors.reset,
                 messages.message.get("synced_successfully").unwrap()
+            );
+
+            #[cfg(target_os = "linux")]
+            println!(
+                "  [{}>{}] {}",
+                colors.bold_green,
+                colors.reset,
+                messages.message.get("wrote_temp_hosts").unwrap()
             );
         } else {
             println!(
