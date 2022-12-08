@@ -75,8 +75,8 @@ pub struct Args {
     pub del_repo_preset: Option<String>,
 
     // Proxy ALL traffic with TOR proxy
-    #[clap(short = 'A', long, value_parser, default_value_t = false)]
-    pub tor_all: bool,
+    #[clap(short = 't', long, value_parser, default_value_t = false)]
+    pub tor: bool,
 
     /// Change TOR bind address
     #[clap(long, value_parser, default_value = "127.0.0.1")]
