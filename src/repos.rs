@@ -19,6 +19,7 @@
 use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
+use crate::tor::if_onion_link;
 use crate::write::write_to_file;
 use crate::Args;
 use std::path::Path;
@@ -33,7 +34,7 @@ fn verify_repo(repo: &String, args: &Args) {
 
     if args.tor_all {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
-    } else if args.tor && repo.contains(".onion") {
+    } else if if_onion_link(repo.to_string()) {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 

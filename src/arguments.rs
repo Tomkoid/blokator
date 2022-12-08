@@ -74,10 +74,6 @@ pub struct Args {
     #[clap(short = 'D', long, value_parser)]
     pub del_repo_preset: Option<String>,
 
-    /// Use TOR proxy for making requests
-    #[clap(short, long, value_parser, default_value_t = false)]
-    pub tor: bool,
-
     // Proxy ALL traffic with TOR proxy
     #[clap(short = 'A', long, value_parser, default_value_t = false)]
     pub tor_all: bool,

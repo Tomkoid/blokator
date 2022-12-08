@@ -17,6 +17,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::Args;
+use crate::tor::if_onion_link;
 use crate::{
     get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
     write::write_to_file,
@@ -31,7 +32,7 @@ pub fn sync(repo: &str, args: &Args) {
 
     if args.tor_all {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
-    } else if args.tor && repo.contains(".onion") {
+    } else if if_onion_link(repo.to_string()) {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 

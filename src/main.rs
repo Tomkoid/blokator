@@ -42,6 +42,7 @@ mod services;
 mod signal_handling;
 mod sync;
 pub mod write;
+pub mod tor;
 
 #[cfg(target_family = "windows")]
 mod windows;
