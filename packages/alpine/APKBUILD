@@ -1,0 +1,26 @@
+# Maintainer: Tomkoid <tomkoid@tomkoid.tk>
+pkgname="blokator"
+pkgver=0.5.2
+pkgrel=1
+pkgdesc="Simple system-wide adblocker"
+url="https://gitlab.com/Tomkoid/blokator"
+arch="x86_64"
+makedepends="cargo git autoconf openssl openssl-dev"
+license="GPL3"
+source="$pkgname-$pkgver.zip::https://gitlab.com/Tomkoid/blokator/-/archive/$pkgver/blokator-$pkgver.zip"
+
+build() {
+  # Prepare man page
+  cp man-pages/blokator man-pages/blokator.1
+  gzip man-pages/blokator.1
+
+  # Build
+  cargo build --release
+}
+
+package() {
+  install -Dm755 "target/release/blokator" "${pkgdir}/usr/bin/blokator"
+  install -Dm644 "man-pages/blokator.1.gz" "${pkgdir}/usr/share/man/man1/blokator.1.gz"
+}
+
+sha512sums="ada6523320dcebf18006c6810dbf562694e7686c2af242be15f85acc16a17ea5e1944410c9e2b377fd3036e403a148d7ec9d453f4e96b723a8e0353adda7885d  blokator-0.5.2.zip"
