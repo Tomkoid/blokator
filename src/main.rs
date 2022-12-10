@@ -300,7 +300,7 @@ fn main() {
                 messages.message.get("local_hosts_missing").unwrap()
             );
             println!(
-                "  {}Help:{} {}",
+                "  {}HELP:{} {}",
                 colors.bold_green,
                 colors.reset,
                 messages.help_message.get("local_hosts_missing").unwrap()
