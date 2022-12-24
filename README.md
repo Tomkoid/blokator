@@ -112,7 +112,7 @@ sudo make install
 **You're done now!**
 
 ### From package manager
-At this moment, Blokator is available only in [AUR](https://aur.archlinux.org) or ~~[tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) for **[Arch Linux](https://archlinux.org)**.~~
+At this moment, Blokator is available only in [AUR](https://aur.archlinux.org) or [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) for **[Arch Linux](https://archlinux.org)**.
 
 To download Blokator from AUR it's recommended to use [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install Blokator.
 
