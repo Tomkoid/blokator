@@ -116,6 +116,5 @@ At this moment, Blokator is available only in [AUR](https://aur.archlinux.org) o
 
 To download Blokator from AUR it's recommended to use [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install Blokator.
 
-~~Checkout [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) installation in **README.md**.~~
+Checkout [tomkoid-repo](https://gitlab.com/Tomkoid/tomkoid-repo) installation in **README.md**.
 
-**TOMKOID-REPO IS CURRENTLY NOT MAINTAINED**
