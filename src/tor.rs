@@ -1,4 +1,4 @@
-// messages.rs
+// tor.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
 // Copyright (C) 2022 Tomáš Zierl
