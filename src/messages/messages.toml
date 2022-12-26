@@ -1,5 +1,5 @@
 [message]
-root_is_required = "You need to run this command with root privilegies, to run the adblocker"
+root_is_required = "You need to run this command with root privilegies to run the adblocker"
 synced = "Synced the adblocker."
 synced_no_change = "No change"
 created_backup = "Backup created."
@@ -11,8 +11,8 @@ networkmanager_restart_manually = "Manually restart the networking service or re
 local_hosts_missing = "Can't apply, because the local hosts are missing."
 etc_hosts_missing = "Can't apply, because the /etc/hosts file is missing."
 already_applied = "Latest ad list already applied."
-adblocker_started = "Blokator started."
-adblocker_started_no_networkmanager = "Started the adblocker, but you must reboot or restart your wifi adapter to see the changes"
+adblocker_started = "Successfully modified the hosts file."
+adblocker_started_no_networkmanager = "Successfully modified the hosts file, but you must reboot or restart your wifi adapter to see the changes"
 synced_successfully = "Synced all repos successfully."
 nothing_changed = "Nothing changed."
 no_action_specified = "No action specified."
@@ -40,4 +40,4 @@ not_found = "Tried to restore the backup, but the backup doesn't exist"
 not_found = "Tried to backup the /etc/hosts file, but /etc/hosts file doesn't exist"
 
 [apply_message]
-not_found = "Tried to start the adblocker, but the /etc/hosts file doesn't exist"
+not_found = "Tried to modify the hosts file, but the /etc/hosts file doesn't exist"
