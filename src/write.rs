@@ -1,7 +1,7 @@
 // write.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
+// Copyright (C) 2023 Tomáš Zierl
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

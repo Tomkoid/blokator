@@ -1,7 +1,7 @@
 // sync.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
+// Copyright (C) 2023 Tomáš Zierl
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::Args;
+use crate::error::check_http_error;
 use crate::tor::if_onion_link;
 use crate::{
     get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
@@ -24,7 +25,8 @@ use crate::{
 };
 use std::{path::Path, process::exit};
 
-pub fn sync(repo: &str, args: &Args) {
+// Returns true if error
+pub fn sync(repo: &str, args: &Args) -> bool {
     let colors = initialize_colors();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
@@ -76,6 +78,8 @@ pub fn sync(repo: &str, args: &Args) {
         }
     };
 
+    let error = check_http_error(&response);
+
     if Path::new(&local_hosts).exists() {
         write_to_file(
             &local_hosts,
@@ -84,4 +88,6 @@ pub fn sync(repo: &str, args: &Args) {
     } else {
         write_to_file(&local_hosts, response);
     }
+
+    error
 }

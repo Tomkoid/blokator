@@ -1,7 +1,7 @@
 // main.rs
 //
 // Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
+// Copyright (C) 2023 Tomáš Zierl
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ mod signal_handling;
 mod sync;
 pub mod write;
 pub mod tor;
+pub mod error;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -198,14 +199,22 @@ fn main() {
 
             let time = std::time::SystemTime::now();
 
-            sync(repo, &args);
+            let error = sync(repo, &args);
 
-            println!(
-                "{}took {}ms{}",
-                colors.bold_green,
-                time.elapsed().expect("counting elapsed time").as_millis(),
-                colors.reset
-            )
+            if !error {
+                println!(
+                    "{}took {}ms{}",
+                    colors.bold_green,
+                    time.elapsed().expect("counting elapsed time").as_millis(),
+                    colors.reset
+                )
+            } else {
+                println!(
+                    "{}error{}",
+                    colors.bold_red,
+                    colors.reset
+                );
+            }
         }
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
