@@ -41,10 +41,9 @@ pub fn get_init() -> Option<Init> {
 }
 
 pub fn exists_networkmanager() -> bool {
-    if let Some(res) = get_init() {
-        true
-    } else {
-        false
+    return match get_init() {
+        Some(_) => true,
+        None => false
     }
 }
 
