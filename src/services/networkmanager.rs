@@ -1,7 +1,7 @@
 use super::init::exists_networkmanager;
 use crate::get_init;
 use crate::initialize_colors::initialize_colors;
-use crate::services::init::restart_networkmanager_init;
+use crate::services::init::{restart_networkmanager_init, Init};
 use crate::Messages;
 
 pub fn restart_networkmanager() {
@@ -27,7 +27,7 @@ pub fn restart_networkmanager() {
              * OpenRC sometime returns 1 as a exit code when printing errors and
              * warning, which is the same exit code
              */
-            if get_init() == 2 {
+            if get_init() == Some(Init::OpenRC) {
                 println!(" {}failed / warning{}", colors.bold_red, colors.reset);
             } else {
                 println!(" {}failed{}", colors.bold_red, colors.reset);

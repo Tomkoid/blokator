@@ -17,30 +17,43 @@ const NETWORKMANAGER_S6_SERVICE_PATH: &str = "/etc/s6/adminsv/default/contents.d
  * 2 - openrc
  * 3 - s6
 */
-pub fn get_init() -> i32 {
+
+#[derive(PartialEq)]
+pub enum Init {
+    SystemD,
+    Runit,
+    OpenRC,
+    S6
+}
+
+pub fn get_init() -> Option<Init> {
     if Path::new(NETWORKMANAGER_SYSTEMD_SERVICE_PATH).exists() {
-        return 0;
+        return Some(Init::SystemD);
     } else if Path::new(NETWORKMANAGER_RUNIT_SERVICE_PATH).exists() {
-        return 1;
+        return Some(Init::Runit);
     } else if Path::new(NETWORKMANAGER_OPENRC_SERVICE_PATH).exists() {
-        return 2;
+        return Some(Init::OpenRC);
     } else if Path::new(NETWORKMANAGER_S6_SERVICE_PATH).exists() {
-        return 3;
+        return Some(Init::S6);
     }
 
-    -1
+    None
 }
 
 pub fn exists_networkmanager() -> bool {
-    get_init() != -1
+    if let Some(res) = get_init() {
+        true
+    } else {
+        false
+    }
 }
 
 pub fn restart_networkmanager_init() -> Result<std::process::ExitStatus, std::io::Error> {
     match get_init() {
-        0 => networkmanager_systemd_restart(),
-        1 => networkmanager_runit_restart(),
-        2 => networkmanager_openrc_restart(),
-        3 => networkmanager_s6_restart(),
-        _ => networkmanager_systemd_restart(),
+        Some(Init::SystemD) => networkmanager_systemd_restart(),
+        Some(Init::Runit) => networkmanager_runit_restart(),
+        Some(Init::OpenRC) => networkmanager_openrc_restart(),
+        Some(Init::S6) => networkmanager_s6_restart(),
+        None => networkmanager_systemd_restart(),
     }
 }
