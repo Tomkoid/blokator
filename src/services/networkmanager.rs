@@ -1,38 +1,19 @@
-// services/networkmanger.rs
-//
-// Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-use super::init::exists_networkmanager;
-use crate::get_init;
 use crate::initialize_colors::initialize_colors;
-use crate::services::init::restart_networkmanager_init;
+use crate::services::init::Init;
+use crate::services::init::NetworkManager;
 use crate::Messages;
 
 pub fn restart_networkmanager() {
     let colors = initialize_colors();
     let messages: Messages = Messages::new();
 
-    if exists_networkmanager() {
+    if NetworkManager::exists() {
         print!(
             "{}  >{} Restarting NetworkManager..",
             colors.bold_blue, colors.reset
         );
 
-        let networkmanager_status = match restart_networkmanager_init() {
+        let networkmanager_status = match NetworkManager::restart() {
             Ok(s) => s,
             Err(e) => panic!("couldn't restart NetworkManager: {e}"),
         };
@@ -45,7 +26,7 @@ pub fn restart_networkmanager() {
              * OpenRC sometime returns 1 as a exit code when printing errors and
              * warning, which is the same exit code
              */
-            if get_init() == 2 {
+            if Init::get_init() == Some(Init::OpenRC) {
                 println!(" {}failed / warning{}", colors.bold_red, colors.reset);
             } else {
                 println!(" {}failed{}", colors.bold_red, colors.reset);

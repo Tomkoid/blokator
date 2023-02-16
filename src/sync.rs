@@ -1,37 +1,22 @@
-// sync.rs
-//
-// Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use crate::Args;
+use crate::error::check_http_error;
+use crate::tor::if_onion_link;
 use crate::{
     get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
     write::write_to_file,
 };
 use std::{path::Path, process::exit};
 
-pub fn sync(repo: &str, args: &Args) {
+// Returns true if error
+pub fn sync(repo: &str, args: &Args) -> bool {
     let colors = initialize_colors();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
 
-    if args.tor_all {
+    if args.tor {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
-    } else if args.tor && repo.contains(".onion") {
+    } else if if_onion_link(repo.to_string()) {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
@@ -75,6 +60,8 @@ pub fn sync(repo: &str, args: &Args) {
         }
     };
 
+    let error = check_http_error(&response);
+
     if Path::new(&local_hosts).exists() {
         write_to_file(
             &local_hosts,
@@ -83,4 +70,6 @@ pub fn sync(repo: &str, args: &Args) {
     } else {
         write_to_file(&local_hosts, response);
     }
+
+    error
 }

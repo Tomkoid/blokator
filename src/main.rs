@@ -1,21 +1,3 @@
-// main.rs
-//
-// Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 #![allow(unreachable_code)]
 
 use clap::Parser;
@@ -42,6 +24,8 @@ mod services;
 mod signal_handling;
 mod sync;
 pub mod write;
+pub mod tor;
+pub mod error;
 
 #[cfg(target_family = "windows")]
 mod windows;
@@ -49,7 +33,7 @@ mod windows;
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::initialize_colors::initialize_colors;
-use crate::presets::presets::Presets;
+use crate::presets::preset::Presets;
 use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
@@ -64,9 +48,9 @@ use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
 use crate::repos::{add_repo, del_repo, list_repos};
-use crate::services::init::get_init;
 use crate::signal_handling::handle_signals;
 use crate::sync::sync;
+use crate::write::write_to_file;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
@@ -159,6 +143,7 @@ fn main() {
     if args.sync {
         *state.lock().unwrap() = true;
         let repos_file_location = format!("{}/repos", get_data_dir());
+        let hosts_temp = "/tmp/blokator".to_string();
 
         let local_hosts = format!("{}/hosts", get_data_dir());
 
@@ -195,24 +180,43 @@ fn main() {
 
             let time = std::time::SystemTime::now();
 
-            sync(repo, &args);
+            let error = sync(repo, &args);
 
-            println!(
-                "{}took {}ms{}",
-                colors.bold_green,
-                time.elapsed().expect("counting elapsed time").as_millis(),
-                colors.reset
-            )
+            if !error {
+                println!(
+                    "{}took {}ms{}",
+                    colors.bold_green,
+                    time.elapsed().expect("counting elapsed time").as_millis(),
+                    colors.reset
+                )
+            } else {
+                println!(
+                    "{}error{}",
+                    colors.bold_red,
+                    colors.reset
+                );
+            }
         }
 
         let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
 
+        #[cfg(target_os = "linux")]
+        write_to_file(&hosts_temp, read_file_to_string(&local_hosts).unwrap());
+
         if changed {
             println!(
                 "  [{}+{}] {}",
-                colors.bold_yellow,
+                colors.bold_green,
                 colors.reset,
                 messages.message.get("synced_successfully").unwrap()
+            );
+
+            #[cfg(target_os = "linux")]
+            println!(
+                "  [{}>{}] {}",
+                colors.bold_green,
+                colors.reset,
+                messages.message.get("wrote_temp_hosts").unwrap()
             );
         } else {
             println!(
@@ -286,7 +290,7 @@ fn main() {
                 messages.message.get("local_hosts_missing").unwrap()
             );
             println!(
-                "  {}Help:{} {}",
+                "  {}HELP:{} {}",
                 colors.bold_green,
                 colors.reset,
                 messages.help_message.get("local_hosts_missing").unwrap()
@@ -339,7 +343,7 @@ fn main() {
 
         apply_android(&args);
         println!(
-            "  {}>{} {}",
+            "  [{}>{}] {}",
             colors.bold_green,
             colors.reset,
             messages

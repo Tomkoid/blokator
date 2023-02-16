@@ -1,27 +1,5 @@
-// services/init.rs
-//
-// Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use std::path::Path;
-
-use super::openrc::networkmanager_openrc_restart;
-use super::runit::networkmanager_runit_restart;
-use super::s6::networkmanager_s6_restart;
-use super::systemd::networkmanager_systemd_restart;
+use std::process::Command;
 
 const NETWORKMANAGER_SYSTEMD_SERVICE_PATH: &str =
     "/etc/systemd/system/multi-user.target.wants/NetworkManager.service";
@@ -35,30 +13,74 @@ const NETWORKMANAGER_S6_SERVICE_PATH: &str = "/etc/s6/adminsv/default/contents.d
  * 2 - openrc
  * 3 - s6
 */
-pub fn get_init() -> i32 {
-    if Path::new(NETWORKMANAGER_SYSTEMD_SERVICE_PATH).exists() {
-        return 0;
-    } else if Path::new(NETWORKMANAGER_RUNIT_SERVICE_PATH).exists() {
-        return 1;
-    } else if Path::new(NETWORKMANAGER_OPENRC_SERVICE_PATH).exists() {
-        return 2;
-    } else if Path::new(NETWORKMANAGER_S6_SERVICE_PATH).exists() {
-        return 3;
+
+pub struct NetworkManager;
+
+#[derive(PartialEq)]
+pub enum Init {
+    SystemD,
+    Runit,
+    OpenRC,
+    S6
+}
+
+impl NetworkManager {
+    pub fn exists() -> bool {
+        return match Init::get_init() {
+            Some(_) => true,
+            None => false
+        }
     }
 
-    -1
-}
-
-pub fn exists_networkmanager() -> bool {
-    get_init() != -1
-}
-
-pub fn restart_networkmanager_init() -> Result<std::process::ExitStatus, std::io::Error> {
-    match get_init() {
-        0 => networkmanager_systemd_restart(),
-        1 => networkmanager_runit_restart(),
-        2 => networkmanager_openrc_restart(),
-        3 => networkmanager_s6_restart(),
-        _ => networkmanager_systemd_restart(),
+    pub fn restart() -> Result<std::process::ExitStatus, std::io::Error> {
+        match Init::get_init() {
+            Some(Init::SystemD) => Init::systemd_restart(),
+            Some(Init::Runit) => Init::runit_restart(),
+            Some(Init::OpenRC) => Init::openrc_restart(),
+            Some(Init::S6) => Init::s6_restart(),
+            None => Init::systemd_restart(),
+        }
     }
 }
+
+impl Init {
+    pub fn get_init() -> Option<Init> {
+        if Path::new(NETWORKMANAGER_SYSTEMD_SERVICE_PATH).exists() {
+            return Some(Init::SystemD);
+        } else if Path::new(NETWORKMANAGER_RUNIT_SERVICE_PATH).exists() {
+            return Some(Init::Runit);
+        } else if Path::new(NETWORKMANAGER_OPENRC_SERVICE_PATH).exists() {
+            return Some(Init::OpenRC);
+        } else if Path::new(NETWORKMANAGER_S6_SERVICE_PATH).exists() {
+            return Some(Init::S6);
+        }
+
+        None
+    }
+
+    pub fn systemd_restart() -> Result<std::process::ExitStatus, std::io::Error> {
+        Command::new("systemctl")
+            .args(["restart", "NetworkManager"])
+            .status()
+    }
+
+
+    pub fn runit_restart() -> Result<std::process::ExitStatus, std::io::Error> {
+        Command::new("sv")
+            .args(["restart", "NetworkManager"])
+            .status()
+    }
+
+    pub fn openrc_restart() -> Result<std::process::ExitStatus, std::io::Error> {
+        Command::new("rc-service")
+            .args(["NetworkManager", "restart"])
+            .status()
+    }
+
+    pub fn s6_restart() -> Result<std::process::ExitStatus, std::io::Error> {
+        Command::new("s6-svc")
+            .args(["-r", "/run/service/NetworkManager-srv"])
+            .status()
+    }
+}
+

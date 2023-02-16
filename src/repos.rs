@@ -1,24 +1,7 @@
-// repos.rs
-//
-// Simple cross-platform and system-wide CLI adblocker
-// Copyright (C) 2022 Tomáš Zierl
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use crate::get_data_dir;
 use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
+use crate::tor::if_onion_link;
 use crate::write::write_to_file;
 use crate::Args;
 use std::path::Path;
@@ -31,9 +14,9 @@ fn verify_repo(repo: &String, args: &Args) {
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
 
-    if args.tor_all {
+    if args.tor {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap())
-    } else if args.tor && repo.contains(".onion") {
+    } else if if_onion_link(repo.to_string()) {
         client = client.proxy(reqwest::Proxy::all(tor_proxy).unwrap());
     }
 
