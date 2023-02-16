@@ -48,7 +48,6 @@ use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
 use crate::repos::{add_repo, del_repo, list_repos};
-use crate::services::init::get_init;
 use crate::signal_handling::handle_signals;
 use crate::sync::sync;
 use crate::write::write_to_file;
