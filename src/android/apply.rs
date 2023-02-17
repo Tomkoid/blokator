@@ -1,6 +1,5 @@
 use crate::messages::Messages;
 use crate::Args;
-use std::io::Write;
 use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
@@ -13,25 +12,6 @@ use super::checks::device_ready;
 use super::clear_line;
 
 use spinners::Spinner;
-
-pub fn print_done() {
-    let colors = initialize_colors();
-
-    println!(" {}done{}", colors.bold_green, colors.reset);
-}
-
-pub fn print_msg(query_msg: &str) {
-    let colors = initialize_colors();
-    let messages = Messages::new();
-
-    print!(
-        "  [{}*{}] {} ",
-        colors.bold_blue,
-        colors.reset,
-        messages.message.get(query_msg).unwrap()
-    );
-    std::io::stdout().flush().unwrap();
-}
 
 // Send notification and return bool with success state
 pub fn send_notification(android_device: &String) -> bool {

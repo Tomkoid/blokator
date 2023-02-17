@@ -4,20 +4,6 @@ use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
 
-pub fn check_android_feature() {
-    #[allow(unused_variables)]
-    let colors = initialize_colors();
-
-    #[cfg(not(feature = "android"))]
-    {
-        println!(
-            "   {}>{} To use this feature, you need to compile Blokator with `android` feature.",
-            colors.bold_red, colors.reset
-        );
-        exit(1);
-    }
-}
-
 pub fn device_ready(device: &str) -> bool {
     let devices = Command::new("adb")
         .stdout(Stdio::piped())

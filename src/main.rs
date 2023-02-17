@@ -30,7 +30,6 @@ pub mod error;
 #[cfg(target_family = "windows")]
 mod windows;
 
-use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
 use crate::android::restore::restore_android;
 use crate::initialize_colors::initialize_colors;
