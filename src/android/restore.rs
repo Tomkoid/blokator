@@ -2,7 +2,7 @@ use std::process::{Command, exit, Stdio};
 
 use crate::{initialize_colors::initialize_colors, arguments::Args, messages::Messages};
 
-use super::{apply::{print_msg, print_done}, checks::{adb_exists, device_ready}, clear_line};
+use super::{checks::{adb_exists, device_ready}, clear_line};
 
 use spinners::Spinner;
 
