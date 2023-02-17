@@ -340,8 +340,6 @@ fn main() {
     if args.apply_android {
         *state.lock().unwrap() = true;
 
-        check_android_feature();
-
         apply_android(&args);
         println!(
             "[{}+{}] {}",
@@ -357,8 +355,6 @@ fn main() {
     }
 
     if args.restore_android {
-        check_android_feature();
-
         *state.lock().unwrap() = true;
         restore_android(&args);
         *state.lock().unwrap() = false;
@@ -367,8 +363,6 @@ fn main() {
     }
 
     if args.list_devices {
-        check_android_feature();
-
         *state.lock().unwrap() = true;
         list_devices();
         *state.lock().unwrap() = false;
