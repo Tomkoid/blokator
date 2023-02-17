@@ -26,10 +26,7 @@ pub enum Init {
 
 impl NetworkManager {
     pub fn exists() -> bool {
-        return match Init::get_init() {
-            Some(_) => true,
-            None => false
-        }
+        Init::get_init().is_some()
     }
 
     pub fn restart() -> Result<std::process::ExitStatus, std::io::Error> {
