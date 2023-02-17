@@ -22,6 +22,8 @@ All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 
 \f[B]-r, --restore\f[R] - restore backup of hosts file (creates automatically when applying)
 
+\f[B]--restore-android [ANDROID_OPTIONS]\f[R] - restore backup of hosts file on Android (Blokator must be compiled with `android` feature)
+
 \f[B]-b, --backup\f[R] - create a manual backup
 
 \f[B]-m, --add-repo [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository
