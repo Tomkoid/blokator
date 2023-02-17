@@ -32,6 +32,7 @@ mod windows;
 
 use crate::android::checks::check_android_feature;
 use crate::android::list::list_devices;
+use crate::android::restore::restore_android;
 use crate::initialize_colors::initialize_colors;
 use crate::presets::preset::Presets;
 use crate::services::networkmanager::restart_networkmanager;
@@ -352,6 +353,16 @@ fn main() {
                 .unwrap()
         );
         *state.lock().unwrap() = false;
+        exit(0);
+    }
+
+    if args.restore_android {
+        check_android_feature();
+
+        *state.lock().unwrap() = true;
+        restore_android(&args);
+        *state.lock().unwrap() = false;
+
         exit(0);
     }
 

@@ -28,6 +28,7 @@ android_apply_hosts = "Applying modified hosts file.."
 android_mounting_ro = "Mounting root back as read only.."
 wrote_temp_hosts = "You can view the temporary hosts file that can be applied in /tmp/blokator"
 android_send_message = "Trying to send notification to Android device.."
+android_restore = "Restoring backup.."
 
 [help_message]
 local_hosts_missing = "run blokator with `--sync` argument."
