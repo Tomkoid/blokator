@@ -10,6 +10,9 @@ use crate::initialize_colors::initialize_colors;
 
 use super::checks::adb_exists;
 use super::checks::device_ready;
+use super::clear_line;
+
+use spinners::Spinner;
 
 pub fn print_done() {
     let colors = initialize_colors();
@@ -55,6 +58,7 @@ pub fn send_notification(android_device: &String) -> bool {
 
 pub fn apply_android(args: &Args) {
     let colors = initialize_colors();
+    let messages = Messages::new();
 
     let android_device = match &args.android_device {
         Some(value) => value,
@@ -82,7 +86,7 @@ pub fn apply_android(args: &Args) {
         }
     }
 
-    print_msg("android_mounting_rw");
+    let mut mount_system_as_rw_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_rw").unwrap().into());
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
@@ -103,15 +107,17 @@ pub fn apply_android(args: &Args) {
 
     if !mount_system_as_rw.success() {
         println!(
-            "  {}error:{} Failed to mount system as read & write",
+            "{}error:{} Failed to mount system as read & write",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
 
-    print_done();
+    mount_system_as_rw_sp.stop();
+    clear_line();
 
-    print_msg("android_temp_push");
+
+    let mut push_sdcard_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_temp_push").unwrap().into());
 
     // Push temporary hosts file to /sdcard/hosts
     let push_sdcard = Command::new("adb")
@@ -128,15 +134,16 @@ pub fn apply_android(args: &Args) {
 
     if !push_sdcard.success() {
         println!(
-            "  {}error:{} Cannot push the hosts file to the Android device",
+            "{}error:{} Cannot push the hosts file to the Android device",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
 
-    print_done();
+    push_sdcard_sp.stop();
+    clear_line();
 
-    print_msg("android_backup_create");
+    let mut copy_etc_hosts_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_backup_create").unwrap().into());
 
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
@@ -156,15 +163,16 @@ pub fn apply_android(args: &Args) {
 
     if !copy_etc_hosts.success() {
         println!(
-            "  {}error:{} Cannot make a backup of the hosts file",
+            "{}error:{} Cannot make a backup of the hosts file",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
 
-    print_done();
+    copy_etc_hosts_sp.stop();
+    clear_line();
 
-    print_msg("android_apply_hosts");
+    let mut move_to_etc_hosts_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_apply_hosts").unwrap().into());
 
     // Apply / Move hosts file
     let move_to_etc_hosts = Command::new("adb")
@@ -184,15 +192,16 @@ pub fn apply_android(args: &Args) {
 
     if !move_to_etc_hosts.success() {
         println!(
-            "  {}error:{} Cannot apply the hosts file",
+            "{}error:{} Cannot apply the hosts file",
             colors.bold_red, colors.reset
         );
         exit(1);
     }
 
-    print_done();
+    move_to_etc_hosts_sp.stop();
+    clear_line();
 
-    print_msg("android_mounting_ro");
+    let mut mount_system_as_ro_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_ro").unwrap().into());
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
@@ -213,20 +222,22 @@ pub fn apply_android(args: &Args) {
 
     if !mount_system_as_ro.success() {
         println!(
-            "  {}error:{} Failed to mount the system as read only",
+            "{}error:{} Failed to mount the system as read only",
             colors.bold_yellow, colors.reset
         );
     }
 
-    print_done();
+    mount_system_as_ro_sp.stop();
+    clear_line();
 
-    print_msg("android_send_message");
+    let mut send_notification_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_send_message").unwrap().into());
 
     // If send_notification was unsuccessful
     if !send_notification(android_device) {
-        println!(" {}error{}", colors.bold_yellow, colors.reset);
+        println!("{}error{}", colors.bold_yellow, colors.reset);
         exit(0);
     }
 
-    print_done();
+    send_notification_sp.stop();
+    clear_line();
 }

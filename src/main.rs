@@ -344,7 +344,7 @@ fn main() {
 
         apply_android(&args);
         println!(
-            "  [{}>{}] {}",
+            "[{}+{}] {}",
             colors.bold_green,
             colors.reset,
             messages
