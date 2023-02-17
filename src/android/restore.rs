@@ -1,11 +1,14 @@
 use std::process::{Command, exit, Stdio};
 
-use crate::{initialize_colors::initialize_colors, arguments::Args};
+use crate::{initialize_colors::initialize_colors, arguments::Args, messages::Messages};
 
-use super::{apply::{print_msg, print_done}, checks::{adb_exists, device_ready}};
+use super::{apply::{print_msg, print_done}, checks::{adb_exists, device_ready}, clear_line};
+
+use spinners::Spinner;
 
 pub fn restore_android(args: &Args) {
     let colors = initialize_colors();
+    let messages = Messages::new();
 
     let android_device = match &args.android_device {
         Some(value) => value,
@@ -33,7 +36,7 @@ pub fn restore_android(args: &Args) {
         }
     }
 
-    print_msg("android_mounting_rw");
+    let mut mount_system_as_rw_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_rw").unwrap().into());
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
@@ -60,10 +63,10 @@ pub fn restore_android(args: &Args) {
         exit(1);
     }
 
-    print_done();
-
-    
-    print_msg("android_restore");
+    mount_system_as_rw_sp.stop();
+    clear_line();
+   
+    let mut android_restore_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_restore").unwrap().into());
     
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
@@ -89,9 +92,10 @@ pub fn restore_android(args: &Args) {
         exit(1);
     }
 
-    print_done();
+    android_restore_sp.stop();
+    clear_line();
 
-    print_msg("android_mounting_ro");
+    let mut mount_system_as_ro_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_ro").unwrap().into());
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
@@ -116,6 +120,9 @@ pub fn restore_android(args: &Args) {
             colors.bold_yellow, colors.reset
         );
     }
+    
+    mount_system_as_ro_sp.stop();
+    clear_line();
 
-    print_done();
+    println!("RESTORE COMPLETED");
 }
