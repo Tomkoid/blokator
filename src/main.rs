@@ -12,7 +12,9 @@ mod allowed_exit_functions;
 mod android;
 mod arguments;
 pub mod colors;
+mod commands;
 mod copy;
+pub mod error;
 mod handle_permissions;
 mod initialize_colors;
 mod initialize_dirs;
@@ -23,10 +25,8 @@ mod repos;
 mod services;
 mod signal_handling;
 mod sync;
-mod commands;
-pub mod write;
 pub mod tor;
-pub mod error;
+pub mod write;
 
 #[cfg(target_family = "windows")]
 mod windows;

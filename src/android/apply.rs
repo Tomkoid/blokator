@@ -66,7 +66,10 @@ pub fn apply_android(args: &Args) {
         }
     }
 
-    let mut mount_system_as_rw_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_rw").unwrap().into());
+    let mut mount_system_as_rw_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_mounting_rw").unwrap().into(),
+    );
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
@@ -96,8 +99,10 @@ pub fn apply_android(args: &Args) {
     mount_system_as_rw_sp.stop();
     clear_line();
 
-
-    let mut push_sdcard_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_temp_push").unwrap().into());
+    let mut push_sdcard_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_temp_push").unwrap().into(),
+    );
 
     // Push temporary hosts file to /sdcard/hosts
     let push_sdcard = Command::new("adb")
@@ -123,7 +128,14 @@ pub fn apply_android(args: &Args) {
     push_sdcard_sp.stop();
     clear_line();
 
-    let mut copy_etc_hosts_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_backup_create").unwrap().into());
+    let mut copy_etc_hosts_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages
+            .message
+            .get("android_backup_create")
+            .unwrap()
+            .into(),
+    );
 
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
@@ -152,7 +164,10 @@ pub fn apply_android(args: &Args) {
     copy_etc_hosts_sp.stop();
     clear_line();
 
-    let mut move_to_etc_hosts_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_apply_hosts").unwrap().into());
+    let mut move_to_etc_hosts_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_apply_hosts").unwrap().into(),
+    );
 
     // Apply / Move hosts file
     let move_to_etc_hosts = Command::new("adb")
@@ -181,7 +196,10 @@ pub fn apply_android(args: &Args) {
     move_to_etc_hosts_sp.stop();
     clear_line();
 
-    let mut mount_system_as_ro_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_ro").unwrap().into());
+    let mut mount_system_as_ro_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_mounting_ro").unwrap().into(),
+    );
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
@@ -210,7 +228,10 @@ pub fn apply_android(args: &Args) {
     mount_system_as_ro_sp.stop();
     clear_line();
 
-    let mut send_notification_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_send_message").unwrap().into());
+    let mut send_notification_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_send_message").unwrap().into(),
+    );
 
     // If send_notification was unsuccessful
     if !send_notification(android_device) {

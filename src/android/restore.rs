@@ -1,8 +1,11 @@
-use std::process::{Command, exit, Stdio};
+use std::process::{exit, Command, Stdio};
 
-use crate::{initialize_colors::initialize_colors, arguments::Args, messages::Messages};
+use crate::{arguments::Args, initialize_colors::initialize_colors, messages::Messages};
 
-use super::{checks::{adb_exists, device_ready}, clear_line};
+use super::{
+    checks::{adb_exists, device_ready},
+    clear_line,
+};
 
 use spinners::Spinner;
 
@@ -36,7 +39,10 @@ pub fn restore_android(args: &Args) {
         }
     }
 
-    let mut mount_system_as_rw_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_rw").unwrap().into());
+    let mut mount_system_as_rw_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_mounting_rw").unwrap().into(),
+    );
 
     // Mount / as read and write
     let mount_system_as_rw = Command::new("adb")
@@ -65,9 +71,12 @@ pub fn restore_android(args: &Args) {
 
     mount_system_as_rw_sp.stop();
     clear_line();
-   
-    let mut android_restore_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_restore").unwrap().into());
-    
+
+    let mut android_restore_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_restore").unwrap().into(),
+    );
+
     // Create a backup of current hosts file
     let copy_etc_hosts = Command::new("adb")
         .stdout(Stdio::piped())
@@ -95,7 +104,10 @@ pub fn restore_android(args: &Args) {
     android_restore_sp.stop();
     clear_line();
 
-    let mut mount_system_as_ro_sp = Spinner::new(spinners::Spinners::Dots2, messages.message.get("android_mounting_ro").unwrap().into());
+    let mut mount_system_as_ro_sp = Spinner::new(
+        spinners::Spinners::Dots2,
+        messages.message.get("android_mounting_ro").unwrap().into(),
+    );
 
     // Mount / back as read only
     let mount_system_as_ro = Command::new("adb")
@@ -120,7 +132,7 @@ pub fn restore_android(args: &Args) {
             colors.bold_yellow, colors.reset
         );
     }
-    
+
     mount_system_as_ro_sp.stop();
     clear_line();
 

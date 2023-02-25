@@ -8,9 +8,9 @@ use super::checks::adb_exists;
 
 pub fn list_devices() {
     let colors = initialize_colors();
-    
+
     adb_exists();
-    
+
     let devices = Command::new("adb")
         .stdout(Stdio::piped())
         .arg("devices")
@@ -62,7 +62,7 @@ pub fn list_devices() {
         if device_model.is_empty() {
             device_model = "unknown model".to_string();
         }
-        
+
         println!(
             "{}{device_id}{} {}({}, in {device_state} state){}",
             colors.bold_white,

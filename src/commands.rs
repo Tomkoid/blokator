@@ -1,6 +1,26 @@
-use std::{process::exit, path::Path, fs::{self}, io::Write, sync::{Arc, Mutex}};
+use std::{
+    fs::{self},
+    io::Write,
+    path::Path,
+    process::exit,
+    sync::{Arc, Mutex},
+};
 
-use crate::{arguments::Args, repos::{list_repos, add_repo, del_repo}, presets::preset::Presets, get_data_dir, read::read_file_to_string, initialize_colors::initialize_colors, sync::sync, write::write_to_file, copy::copy, HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions, services::networkmanager::restart_networkmanager, android::{apply::apply_android, restore::restore_android, list::list_devices}, messages::Messages};
+use crate::{
+    android::{apply::apply_android, list::list_devices, restore::restore_android},
+    arguments::Args,
+    copy::copy,
+    get_data_dir,
+    initialize_colors::initialize_colors,
+    messages::Messages,
+    presets::preset::Presets,
+    read::read_file_to_string,
+    repos::{add_repo, del_repo, list_repos},
+    services::networkmanager::restart_networkmanager,
+    sync::sync,
+    write::write_to_file,
+    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH,
+};
 
 pub fn exec_command(args: &Args, state: Arc<Mutex<bool>>) {
     // Initialize colors and messages
@@ -101,11 +121,7 @@ pub fn exec_command(args: &Args, state: Arc<Mutex<bool>>) {
                     colors.reset
                 )
             } else {
-                println!(
-                    "{}error{}",
-                    colors.bold_red,
-                    colors.reset
-                );
+                println!("{}error{}", colors.bold_red, colors.reset);
             }
         }
 

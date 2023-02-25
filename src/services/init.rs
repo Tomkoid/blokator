@@ -21,7 +21,7 @@ pub enum Init {
     SystemD,
     Runit,
     OpenRC,
-    S6
+    S6,
 }
 
 impl NetworkManager {
@@ -61,7 +61,6 @@ impl Init {
             .status()
     }
 
-
     pub fn runit_restart() -> Result<std::process::ExitStatus, std::io::Error> {
         Command::new("sv")
             .args(["restart", "NetworkManager"])
@@ -80,4 +79,3 @@ impl Init {
             .status()
     }
 }
-

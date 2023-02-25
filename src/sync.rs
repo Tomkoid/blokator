@@ -1,6 +1,6 @@
-use crate::Args;
 use crate::error::check_http_error;
 use crate::tor::if_onion_link;
+use crate::Args;
 use crate::{
     get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
     write::write_to_file,
