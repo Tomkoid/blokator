@@ -1,6 +1,6 @@
 # Maintainer: Tomkoid <tomkoid@tomkoid.tk>
 pkgname="blokator"
-pkgver=0.5.2
+pkgver=0.5.3
 pkgrel=1
 pkgdesc="Simple system-wide adblocker"
 url="https://gitlab.com/Tomkoid/blokator"
@@ -23,4 +23,6 @@ package() {
   install -Dm644 "man-pages/blokator.1.gz" "${pkgdir}/usr/share/man/man1/blokator.1.gz"
 }
 
-sha512sums="ada6523320dcebf18006c6810dbf562694e7686c2af242be15f85acc16a17ea5e1944410c9e2b377fd3036e403a148d7ec9d453f4e96b723a8e0353adda7885d  blokator-0.5.2.zip"
+sha512sums="
+6cfdc3bd96454b0d855c84665aa0df6c6c3c7fc4cc712c44b7b6b9c87543b0083eb99a37c4a40d336d08d8d732a9c817242c2187bd801ffd99f499644c3d46ee  blokator-0.5.3.zip
+"
