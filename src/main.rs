@@ -2,9 +2,6 @@
 
 use clap::Parser;
 use dirs::home_dir;
-use std::fs;
-use std::io::Write;
-use std::path::Path;
 use std::process::exit;
 use std::sync::{Arc, Mutex};
 
@@ -31,28 +28,19 @@ pub mod write;
 #[cfg(target_family = "windows")]
 mod windows;
 
-use crate::android::list::list_devices;
-use crate::android::restore::restore_android;
 use crate::commands::exec_command;
 use crate::initialize_colors::initialize_colors;
-use crate::presets::preset::Presets;
-use crate::services::networkmanager::restart_networkmanager;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 use arguments::Args;
 
 use crate::allowed_exit_functions::check_allowed_function;
-use crate::android::apply::apply_android;
 use crate::colors::Colors;
-use crate::copy::copy;
 use crate::handle_permissions::handle_permissions;
 use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
-use crate::repos::{add_repo, del_repo, list_repos};
 use crate::signal_handling::handle_signals;
-use crate::sync::sync;
-use crate::write::write_to_file;
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
