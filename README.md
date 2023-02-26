@@ -85,7 +85,7 @@ cargo install blokator
 **MAKE SURE THAT `~/.cargo/bin` IS IN YOUR `$PATH`**
 
 #### With Git and Make
-First, you need to clone the [git repo](https://gitlab.com/Tomkoid/blokator) to your local machine:
+First, you need to clone the [git repo](https://codeberg.org/Tomkoid/blokator) to your local machine:
 
 ```
 git clone https://gitlab.com/Tomkoid/blokator.git
