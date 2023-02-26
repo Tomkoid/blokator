@@ -1,3 +1,4 @@
+#[cfg(target_family = "unix")]
 use signal_hook::{consts::SIGINT, consts::SIGTERM, iterator::Signals};
 use std::process::exit;
 use std::{sync::Arc, sync::Mutex, thread};
@@ -5,6 +6,7 @@ use std::{sync::Arc, sync::Mutex, thread};
 use crate::initialize_colors::initialize_colors;
 
 // Signal handling (ex: CTRL + c)
+#[cfg(target_family = "unix")]
 pub fn handle_signals(thread_state: Arc<Mutex<bool>>) {
     let mut signals = Signals::new([SIGTERM, SIGINT]).unwrap();
 

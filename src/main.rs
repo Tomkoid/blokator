@@ -40,6 +40,7 @@ use crate::handle_permissions::handle_permissions;
 use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
+#[cfg(target_family = "unix")]
 use crate::signal_handling::handle_signals;
 
 #[cfg(target_family = "unix")]
