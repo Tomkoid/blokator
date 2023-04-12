@@ -2,9 +2,9 @@
 
 use clap::Parser;
 use dirs::home_dir;
-use spinners::Spinner;
+
 use std::process::exit;
-use std::sync::{Arc, Mutex};
+
 
 pub mod actions;
 mod allowed_exit_functions;
@@ -22,7 +22,6 @@ pub mod presets;
 pub mod read;
 mod repos;
 mod services;
-mod signal_handling;
 mod sync;
 pub mod tor;
 pub mod write;
@@ -42,8 +41,7 @@ use crate::handle_permissions::handle_permissions;
 use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
-#[cfg(target_family = "unix")]
-use crate::signal_handling::handle_signals;
+
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";

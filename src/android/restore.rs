@@ -1,6 +1,6 @@
 use std::process::{exit, Command, Stdio};
 
-use crate::{arguments::Args, initialize_colors::initialize_colors, messages::Messages};
+use crate::{initialize_colors::initialize_colors, messages::Messages};
 
 use super::{
     checks::{adb_exists, device_ready},

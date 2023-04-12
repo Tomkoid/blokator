@@ -2,7 +2,7 @@ use crate::{HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions, services::networkmanage
 
 use super::*;
 
-pub fn apply_hosts(args: Args) {
+pub fn apply_hosts(_args: Args) {
     let colors = Colors::new();
     let messages = Messages::new();
 
