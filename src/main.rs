@@ -2,6 +2,7 @@
 
 use clap::Parser;
 use dirs::home_dir;
+use spinners::Spinner;
 use std::process::exit;
 use std::sync::{Arc, Mutex};
 
@@ -49,10 +50,13 @@ const HOSTS_FILE: &str = "/etc/hosts";
 #[cfg(target_family = "unix")]
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
 
+
 #[cfg(target_family = "windows")]
 const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
 #[cfg(target_family = "windows")]
 const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
+
+const SPINNER_TYPE: spinners::Spinners = spinners::Spinners::Dots2;
 
 #[derive(PartialEq, Eq)]
 pub enum Actions {

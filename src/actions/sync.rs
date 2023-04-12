@@ -1,6 +1,9 @@
 use std::{path::Path, io::Write, fs};
 use std::process::exit;
 
+use spinners::Spinner;
+
+use crate::SPINNER_TYPE;
 use crate::{get_data_dir, read::read_file_to_string, colors::Colors, messages::Messages, sync::sync, write::write_to_file, arguments::Args};
 
 pub fn sync_repositories(args: Args) {
@@ -34,27 +37,33 @@ pub fn sync_repositories(args: Args) {
             continue;
         }
 
-        print!(
-            "  [{}*{}] {} {}.. ",
-            colors.bold_blue,
-            colors.reset,
-            messages.message.get("syncing").unwrap(),
-            repo,
+        // print!(
+        //     "  [{}*{}] {} {}.. ",
+        //     colors.bold_blue,
+        //     colors.reset,
+        //     messages.message.get("syncing").unwrap(),
+        //     repo,
+        // );
+
+        let mut syncing_spinner = Spinner::new(
+            SPINNER_TYPE,
+            format!(
+                "{}{}{} {}{}{}",
+                colors.bold_blue,
+                messages.message.get("syncing").unwrap(),
+                colors.reset,
+                colors.green,
+                repo,
+                colors.reset
+            ),
         );
 
         std::io::stdout().flush().unwrap();
 
-        let time = std::time::SystemTime::now();
-
         let error = sync(repo, &args);
 
         if !error {
-            println!(
-                "{}took {}ms{}",
-                colors.bold_green,
-                time.elapsed().expect("counting elapsed time").as_millis(),
-                colors.reset
-            )
+            syncing_spinner.stop_with_newline();
         } else {
             println!("{}error{}", colors.bold_red, colors.reset);
         }
@@ -67,24 +76,18 @@ pub fn sync_repositories(args: Args) {
 
     if changed {
         println!(
-            "  [{}+{}] {}",
-            colors.bold_green,
-            colors.reset,
+            "{}",
             messages.message.get("synced_successfully").unwrap()
         );
 
         #[cfg(target_os = "linux")]
         println!(
-            "  [{}>{}] {}",
-            colors.bold_green,
-            colors.reset,
+            "{}",
             messages.message.get("wrote_temp_hosts").unwrap()
         );
     } else {
         println!(
-            "  [{}-{}] {}",
-            colors.bold_yellow,
-            colors.reset,
+            "{}",
             messages.message.get("nothing_changed").unwrap()
         );
     }
