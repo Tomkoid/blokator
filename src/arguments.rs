@@ -7,7 +7,11 @@ use clap::Parser;
     about,
     long_about = "Easy system-wide adblocker"
 )]
+#[clap(propagate_version = true)]
 pub struct Args {
+    #[clap(subcommand)]
+    pub command: Commands,
+
     /// Start the adblocker
     #[clap(short, long, value_parser, default_value_t = false)]
     pub apply: bool,
@@ -23,10 +27,6 @@ pub struct Args {
     /// List all Android devices (need to have USB debugging on)
     #[clap(long, value_parser, default_value_t = false)]
     pub list_devices: bool,
-
-    /// Sync the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    pub sync: bool,
 
     /// Restore /etc/hosts backup
     #[clap(short, long, value_parser, default_value_t = false)]
@@ -71,4 +71,16 @@ pub struct Args {
     /// Change TOR port
     #[clap(long, value_parser, default_value_t = 9050)]
     pub tor_port: i32,
+}
+
+#[derive(Parser, Debug, Clone, PartialEq)]
+pub enum Commands {
+    Sync(SyncArgs),
+    Apply {},
+
+}
+
+#[derive(Parser, Debug, Clone, PartialEq)]
+pub struct SyncArgs {
+    sync_type: Option<String>,
 }

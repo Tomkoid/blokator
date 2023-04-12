@@ -5,6 +5,7 @@ use dirs::home_dir;
 use std::process::exit;
 use std::sync::{Arc, Mutex};
 
+pub mod actions;
 mod allowed_exit_functions;
 mod android;
 mod arguments;
@@ -61,15 +62,6 @@ pub enum Actions {
 }
 
 fn main() {
-    // This will be true if some action is running
-    let state = Arc::new(Mutex::new(false));
-
-    #[cfg(target_os = "linux")]
-    let thread_state = Arc::clone(&state);
-
-    #[cfg(target_os = "linux")]
-    handle_signals(thread_state);
-
     // Initialize colors
     let colors = initialize_colors();
 
@@ -87,7 +79,7 @@ fn main() {
         initialize_dir();
     }
 
-    exec_command(&args, state);
+    exec_command(&args);
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
