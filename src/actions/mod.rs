@@ -10,3 +10,4 @@ pub use crate::copy::copy;
 pub mod sync;
 pub mod apply;
 pub mod backup;
+pub mod restore;

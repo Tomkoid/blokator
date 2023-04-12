@@ -19,7 +19,7 @@ use crate::{
     services::networkmanager::restart_networkmanager,
     sync::sync,
     write::write_to_file,
-    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup},
+    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup},
 };
 
 use crate::actions::sync::sync_repositories;
@@ -68,6 +68,7 @@ pub fn exec_command(args: &Args) {
         Commands::Sync(_) => sync_repositories(args.to_owned()),
         Commands::Apply => apply_hosts(args.to_owned()),
         Commands::Backup => backup(),
+        Commands::Restore => restore_backup(),
         _ => todo!()
     };
 
