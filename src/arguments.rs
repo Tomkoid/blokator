@@ -27,17 +27,29 @@ pub struct Args {
 
 #[derive(Parser, Debug, Clone, PartialEq)]
 pub enum Commands {
+    /// Synchronize the repositories
     Sync(SyncArgs),
+    /// Apply the hosts file
     Apply,
+    /// Apply the hosts file to an Android device
     ApplyAndroid(AndroidArgs),
+    /// Backup the current hosts file
     Backup,
+    /// Restore the backup hosts file
     Restore,
+    /// Restore the backup hosts file on an Android device
     RestoreAndroid(AndroidArgs),
+    /// Add new hosts repository (URL)
     AddRepo(RepoArgs),
+    /// Add new hosts repository by preset (name)
     AddRepoPreset(RepoArgs),
+    /// Delete repository (URL)
     DelRepo(RepoArgs),
+    /// Delete repository by preset (name)
     DelRepoPreset(RepoArgs),
+    /// List all currently applied repositories
     ListRepos,
+    /// List all connected ADB devices
     ListDevices,
 }
 
