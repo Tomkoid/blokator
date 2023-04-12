@@ -61,7 +61,9 @@ pub enum Commands {
     Backup,
     Restore,
     AddRepo(RepoArgs),
+    AddRepoPreset(RepoArgs),
     DelRepo(RepoArgs),
+    DelRepoPreset(RepoArgs),
     ListRepos,
 }
 

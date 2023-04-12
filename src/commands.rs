@@ -19,7 +19,7 @@ use crate::{
     services::networkmanager::restart_networkmanager,
     sync::sync,
     write::write_to_file,
-    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action, list_repos::list_repos_action},
+    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action, list_repos::list_repos_action, add_repo_preset::add_repo_preset_action, del_repo_preset::del_repo_preset_action},
 };
 
 use crate::actions::sync::sync_repositories;
@@ -29,27 +29,15 @@ pub fn exec_command(args: &Args) {
     let colors = initialize_colors();
     let messages = Messages::new();
 
-    // Add repo from preset
-    if args.add_repo_preset.is_some() {
-        let repo = Presets::get(args.add_repo_preset.clone().unwrap());
-        add_repo(&repo, &args);
-        exit(0);
-    }
-
-    // Delete repo from preset
-    if args.del_repo_preset.is_some() {
-        let repo = Presets::get(args.clone().del_repo_preset.unwrap());
-        del_repo(repo);
-        exit(0);
-    }
-
     match args.to_owned().command {
         Commands::Sync(_) => sync_repositories(args.to_owned()),
         Commands::Apply => apply_hosts(args.to_owned()),
         Commands::Backup => backup(),
         Commands::Restore => restore_backup(),
         Commands::AddRepo(a) => add_repo_action(a.repo, args.to_owned()),
+        Commands::AddRepoPreset(a) => add_repo_preset_action(a.repo, args.to_owned()),
         Commands::DelRepo(a) => del_repo_action(a.repo),
+        Commands::DelRepoPreset(a) => del_repo_preset_action(a.repo),
         Commands::ListRepos => list_repos_action(),
         _ => todo!()
     };

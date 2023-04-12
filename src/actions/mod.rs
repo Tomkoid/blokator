@@ -12,5 +12,7 @@ pub mod apply;
 pub mod backup;
 pub mod restore;
 pub mod add_repo;
+pub mod add_repo_preset;
 pub mod del_repo;
+pub mod del_repo_preset;
 pub mod list_repos;
