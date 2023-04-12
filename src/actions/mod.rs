@@ -13,3 +13,4 @@ pub mod backup;
 pub mod restore;
 pub mod add_repo;
 pub mod del_repo;
+pub mod list_repos;

@@ -28,17 +28,9 @@ pub struct Args {
     #[clap(long, value_parser, default_value_t = false)]
     pub restore_android: bool,
 
-    /// Add repo for hosts files
-    #[clap(short = 'm', long, value_parser)]
-    pub add_repo: Option<String>,
-
     /// List all repos
     #[clap(short, long, value_parser, default_value_t = false)]
     pub list_repos: bool,
-
-    /// Delete specified repo from the repo list
-    #[clap(short, long, value_parser, default_value = "none")]
-    pub del_repo: String,
 
     /// Add repo from preset
     #[clap(short = 'M', long, value_parser)]
@@ -68,9 +60,9 @@ pub enum Commands {
     ApplyAndroid,
     Backup,
     Restore,
-    ListRepos,
     AddRepo(RepoArgs),
     DelRepo(RepoArgs),
+    ListRepos,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq)]

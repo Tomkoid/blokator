@@ -19,7 +19,7 @@ use crate::{
     services::networkmanager::restart_networkmanager,
     sync::sync,
     write::write_to_file,
-    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action},
+    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action, list_repos::list_repos_action},
 };
 
 use crate::actions::sync::sync_repositories;
@@ -28,15 +28,6 @@ pub fn exec_command(args: &Args) {
     // Initialize colors and messages
     let colors = initialize_colors();
     let messages = Messages::new();
-
-    // List repos
-    if args.list_repos {
-        let repos_list = list_repos();
-        for repo in repos_list {
-            println!("{}", repo);
-        }
-        exit(0);
-    }
 
     // Add repo from preset
     if args.add_repo_preset.is_some() {
@@ -59,6 +50,7 @@ pub fn exec_command(args: &Args) {
         Commands::Restore => restore_backup(),
         Commands::AddRepo(a) => add_repo_action(a.repo, args.to_owned()),
         Commands::DelRepo(a) => del_repo_action(a.repo),
+        Commands::ListRepos => list_repos_action(),
         _ => todo!()
     };
 
