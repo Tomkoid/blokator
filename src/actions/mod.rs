@@ -11,3 +11,4 @@ pub mod sync;
 pub mod apply;
 pub mod backup;
 pub mod restore;
+pub mod add_repo;

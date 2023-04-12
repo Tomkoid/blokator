@@ -69,11 +69,15 @@ pub enum Commands {
     Backup,
     Restore,
     ListRepos,
-    AddRepo,
+    AddRepo(AddRepoArgs),
     DelRepo,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq)]
 pub struct SyncArgs {
-    sync_type: Option<String>,
+}
+
+#[derive(Parser, Debug, Clone, PartialEq)]
+pub struct AddRepoArgs {
+    pub repo: String
 }
