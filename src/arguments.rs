@@ -12,10 +12,6 @@ pub struct Args {
     #[clap(subcommand)]
     pub command: Commands,
 
-    /// Start the adblocker
-    #[clap(short, long, value_parser, default_value_t = false)]
-    pub apply: bool,
-
     /// Start adblocker on your Android phone with ADB (experimental, root required)
     #[clap(long, value_parser, default_value_t = false)]
     pub apply_android: bool,
@@ -77,7 +73,12 @@ pub struct Args {
 pub enum Commands {
     Sync(SyncArgs),
     Apply,
-
+    ApplyAndroid,
+    Backup,
+    Restore,
+    ListRepos,
+    AddRepo,
+    DelRepo,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq)]
