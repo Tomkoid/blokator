@@ -16,3 +16,7 @@ pub mod add_repo_preset;
 pub mod del_repo;
 pub mod del_repo_preset;
 pub mod list_repos;
+
+pub mod apply_android;
+pub mod restore_android;
+pub mod list_devices;

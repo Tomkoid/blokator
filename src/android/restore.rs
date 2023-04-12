@@ -9,23 +9,9 @@ use super::{
 
 use spinners::Spinner;
 
-pub fn restore_android(args: &Args) {
+pub fn restore_android(android_device: &String) {
     let colors = initialize_colors();
     let messages = Messages::new();
-
-    let android_device = match &args.android_device {
-        Some(value) => value,
-        None => {
-            println!(
-                "{}error:{} No device was specified\n{}HELP:{} try to specify device with `--android-device <device ID>`, list devices with `--list-devices` argument",
-                colors.bold_red,
-                colors.reset,
-                colors.bold_green,
-                colors.reset
-            );
-            exit(1);
-        }
-    };
 
     adb_exists();
     match device_ready(android_device) {
