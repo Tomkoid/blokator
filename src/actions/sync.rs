@@ -1,10 +1,4 @@
-use std::{path::Path, io::Write, fs};
-use std::process::exit;
-
-use spinners::Spinner;
-
-use crate::SPINNER_TYPE;
-use crate::{get_data_dir, read::read_file_to_string, colors::Colors, messages::Messages, sync::sync, write::write_to_file, arguments::Args};
+use super::*;
 
 pub fn sync_repositories(args: Args) {
     let colors = Colors::new();

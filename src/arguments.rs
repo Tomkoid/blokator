@@ -76,7 +76,7 @@ pub struct Args {
 #[derive(Parser, Debug, Clone, PartialEq)]
 pub enum Commands {
     Sync(SyncArgs),
-    Apply {},
+    Apply,
 
 }
 

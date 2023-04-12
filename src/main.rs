@@ -56,7 +56,7 @@ const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
 #[cfg(target_family = "windows")]
 const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
 
-const SPINNER_TYPE: spinners::Spinners = spinners::Spinners::Dots2;
+pub const SPINNER_TYPE: spinners::Spinners = spinners::Spinners::Dots2;
 
 #[derive(PartialEq, Eq)]
 pub enum Actions {
