@@ -24,17 +24,9 @@ pub struct Args {
     #[clap(long, value_parser, default_value_t = false)]
     pub list_devices: bool,
 
-    /// Restore /etc/hosts backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    pub restore: bool,
-
     /// Restore Android backup of hosts files with ADB (experimental, root required)
     #[clap(long, value_parser, default_value_t = false)]
     pub restore_android: bool,
-
-    /// Create a backup to /etc/hosts.backup
-    #[clap(short, long, value_parser, default_value_t = false)]
-    pub backup: bool,
 
     /// Add repo for hosts files
     #[clap(short = 'm', long, value_parser)]
