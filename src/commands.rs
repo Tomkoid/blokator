@@ -19,7 +19,7 @@ use crate::{
     services::networkmanager::restart_networkmanager,
     sync::sync,
     write::write_to_file,
-    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action},
+    Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action},
 };
 
 use crate::actions::sync::sync_repositories;
@@ -45,12 +45,6 @@ pub fn exec_command(args: &Args) {
         exit(0);
     }
 
-    // Delete repo
-    if args.del_repo != "none" {
-        del_repo(args.clone().del_repo);
-        exit(0);
-    }
-
     // Delete repo from preset
     if args.del_repo_preset.is_some() {
         let repo = Presets::get(args.clone().del_repo_preset.unwrap());
@@ -64,6 +58,7 @@ pub fn exec_command(args: &Args) {
         Commands::Backup => backup(),
         Commands::Restore => restore_backup(),
         Commands::AddRepo(a) => add_repo_action(a.repo, args.to_owned()),
+        Commands::DelRepo(a) => del_repo_action(a.repo),
         _ => todo!()
     };
 
