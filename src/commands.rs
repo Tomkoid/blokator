@@ -72,39 +72,6 @@ pub fn exec_command(args: &Args) {
         _ => todo!()
     };
 
-    // Restore backup from /etc/hosts.backup to /etc/hosts
-    if args.restore {
-        if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
-            println!(
-                "  {}>{} {}",
-                colors.bold_red,
-                colors.reset,
-                messages.restore_message.get("not_found").unwrap()
-            );
-            exit(1);
-        }
-        if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap()
-            == read_file_to_string(HOSTS_FILE).unwrap()
-        {
-            println!(
-                "  {}>{} {}",
-                colors.bold_yellow,
-                colors.reset,
-                messages.message.get("backup_already_restored").unwrap()
-            );
-            exit(1);
-        }
-        copy(HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions::Restore);
-        restart_networkmanager();
-        println!(
-            "  {}>{} {}",
-            colors.bold_green,
-            colors.reset,
-            messages.message.get("backup_restored").unwrap()
-        );
-        exit(0);
-    }
-
     // Apply changes on Android device (only if compiling with `feature` crate)
     if args.apply_android {
 
