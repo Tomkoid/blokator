@@ -38,25 +38,25 @@ If you have another init system or networking service, you can restart it manual
 After you installed Blokator, you need to sync the hosts files. To sync the hosts files, run Blokator with **--sync** argument:
 
 ```
-blokator --sync
+blokator sync
 ```
 
 Then you can enable Blokator with **--apply** argument:
 
 ```
-blokator --apply
+blokator apply
 ```
 
 To add your own hosts file, you can add your repo with **--add-repo** argument:
 
 ```
-blokator --add-repo <URL>
+blokator add-repo <URL>
 ```
 
 To delete repo you added, you can run Blokator with **--del-repo** argument:
 
 ```
-blokator --del-repo <URL>
+blokator del-repo <URL>
 ```
 
 To display the help page with all available commands, you can run Blokator with **--help** argument:
