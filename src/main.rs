@@ -2,9 +2,11 @@
 
 use clap::Parser;
 use dirs::home_dir;
-use std::process::exit;
-use std::sync::{Arc, Mutex};
 
+use std::process::exit;
+
+
+pub mod actions;
 mod allowed_exit_functions;
 mod android;
 mod arguments;
@@ -20,7 +22,6 @@ pub mod presets;
 pub mod read;
 mod repos;
 mod services;
-mod signal_handling;
 mod sync;
 pub mod tor;
 pub mod write;
@@ -40,18 +41,20 @@ use crate::handle_permissions::handle_permissions;
 use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
-#[cfg(target_family = "unix")]
-use crate::signal_handling::handle_signals;
+
 
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
 #[cfg(target_family = "unix")]
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
 
+
 #[cfg(target_family = "windows")]
 const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";
 #[cfg(target_family = "windows")]
 const HOSTS_FILE_BACKUP_PATH: &str = r"C:\Windows\System32\drivers\etc\hosts.backup";
+
+pub const SPINNER_TYPE: spinners::Spinners = spinners::Spinners::Dots2;
 
 #[derive(PartialEq, Eq)]
 pub enum Actions {
@@ -61,15 +64,6 @@ pub enum Actions {
 }
 
 fn main() {
-    // This will be true if some action is running
-    let state = Arc::new(Mutex::new(false));
-
-    #[cfg(target_os = "linux")]
-    let thread_state = Arc::clone(&state);
-
-    #[cfg(target_os = "linux")]
-    handle_signals(thread_state);
-
     // Initialize colors
     let colors = initialize_colors();
 
@@ -87,7 +81,7 @@ fn main() {
         initialize_dir();
     }
 
-    exec_command(&args, state);
+    exec_command(&args);
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
