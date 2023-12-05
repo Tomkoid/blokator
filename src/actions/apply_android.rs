@@ -5,7 +5,7 @@ use super::*;
 pub fn apply_android_action(android_device: String) {
     let colors = Colors::new();
     let messages = Messages::new();
-    
+
     apply_android(&android_device);
     println!(
         "[{}+{}] {}",

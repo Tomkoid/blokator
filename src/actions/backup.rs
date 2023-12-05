@@ -1,4 +1,4 @@
-use crate::{HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions};
+use crate::{Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH};
 
 use super::*;
 
@@ -15,4 +15,3 @@ pub fn backup() {
     );
     exit(0);
 }
-

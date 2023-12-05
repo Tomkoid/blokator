@@ -5,7 +5,6 @@ use dirs::home_dir;
 
 use std::process::exit;
 
-
 pub mod actions;
 mod allowed_exit_functions;
 mod android;
@@ -42,12 +41,10 @@ use crate::initialize_dirs::{already_initialized, initialize_dir};
 use crate::messages::Messages;
 use crate::read::read_file_to_string;
 
-
 #[cfg(target_family = "unix")]
 const HOSTS_FILE: &str = "/etc/hosts";
 #[cfg(target_family = "unix")]
 const HOSTS_FILE_BACKUP_PATH: &str = "/etc/hosts.backup";
-
 
 #[cfg(target_family = "windows")]
 const HOSTS_FILE: &str = r"C:\Windows\System32\drivers\etc\hosts";

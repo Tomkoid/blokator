@@ -1,7 +1,12 @@
-
-
 use crate::{
-    arguments::{Args, Commands}, actions::{apply::apply_hosts, backup::backup, restore::restore_backup, add_repo::add_repo_action, del_repo::del_repo_action, list_repos::list_repos_action, add_repo_preset::add_repo_preset_action, del_repo_preset::del_repo_preset_action, apply_android::apply_android_action, restore_android::restore_android_action, list_devices::list_devices_action},
+    actions::{
+        add_repo::add_repo_action, add_repo_preset::add_repo_preset_action, apply::apply_hosts,
+        apply_android::apply_android_action, backup::backup, del_repo::del_repo_action,
+        del_repo_preset::del_repo_preset_action, list_devices::list_devices_action,
+        list_repos::list_repos_action, restore::restore_backup,
+        restore_android::restore_android_action,
+    },
+    arguments::{Args, Commands},
 };
 
 use crate::actions::sync::sync_repositories;

@@ -69,21 +69,12 @@ pub fn sync_repositories(args: Args) {
     write_to_file(&hosts_temp, read_file_to_string(&local_hosts).unwrap());
 
     if changed {
-        println!(
-            "{}",
-            messages.message.get("synced_successfully").unwrap()
-        );
+        println!("{}", messages.message.get("synced_successfully").unwrap());
 
         #[cfg(target_os = "linux")]
-        println!(
-            "{}",
-            messages.message.get("wrote_temp_hosts").unwrap()
-        );
+        println!("{}", messages.message.get("wrote_temp_hosts").unwrap());
     } else {
-        println!(
-            "{}",
-            messages.message.get("nothing_changed").unwrap()
-        );
+        println!("{}", messages.message.get("nothing_changed").unwrap());
     }
 
     exit(0);

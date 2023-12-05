@@ -1,4 +1,6 @@
-use crate::{HOSTS_FILE_BACKUP_PATH, HOSTS_FILE, Actions, services::networkmanager::restart_networkmanager};
+use crate::{
+    services::networkmanager::restart_networkmanager, Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH,
+};
 
 use super::*;
 

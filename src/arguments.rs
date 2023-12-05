@@ -54,17 +54,16 @@ pub enum Commands {
 }
 
 #[derive(Parser, Debug, Clone, PartialEq)]
-pub struct SyncArgs {
-}
+pub struct SyncArgs {}
 
 #[derive(Parser, Debug, Clone, PartialEq)]
 pub struct RepoArgs {
     /// Specify repository
-    pub repo: String
+    pub repo: String,
 }
 
 #[derive(Parser, Debug, Clone, PartialEq)]
 pub struct AndroidArgs {
     /// Specify android device (with device ID) (list devices with `--list-devices`)
-    pub device: String
+    pub device: String,
 }
