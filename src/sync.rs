@@ -1,15 +1,13 @@
+use crate::actions::Colors;
 use crate::error::check_http_error;
 use crate::tor::if_onion_link;
 use crate::Args;
-use crate::{
-    get_data_dir, initialize_colors::initialize_colors, read::read_file_to_string,
-    write::write_to_file,
-};
+use crate::{get_data_dir, read::read_file_to_string, write::write_to_file};
 use std::{path::Path, process::exit};
 
 // Returns true if error
 pub fn sync(repo: &str, args: &Args) -> bool {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);

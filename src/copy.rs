@@ -1,12 +1,12 @@
 use std::io::ErrorKind;
 use std::process::exit;
 
-use crate::initialize_colors::initialize_colors;
+use crate::actions::Colors;
 use crate::messages::Messages;
 use crate::{read::read_file_to_string, write::write_to_file, Actions};
 
 pub fn copy(from: &str, to: &str, action: Actions) {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     let messages: Messages = Messages::new();
 
