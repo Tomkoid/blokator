@@ -48,7 +48,7 @@ pub fn restore_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !mount_system_as_rw.success() {
-        println!(
+        eprintln!(
             "  {}error:{} Failed to mount system as read & write",
             colors.bold_red, colors.reset
         );
@@ -80,7 +80,7 @@ pub fn restore_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !copy_etc_hosts.success() {
-        println!(
+        eprintln!(
             "  {}error:{} Cannot restore a backup of the hosts file",
             colors.bold_red, colors.reset
         );
@@ -113,7 +113,7 @@ pub fn restore_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !mount_system_as_ro.success() {
-        println!(
+        eprintln!(
             "  {}error:{} Failed to mount the system as read only",
             colors.bold_yellow, colors.reset
         );

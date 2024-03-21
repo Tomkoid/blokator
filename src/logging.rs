@@ -15,7 +15,7 @@ impl Logger {
     }
 
     pub fn log_error(&self, error_type: &str) {
-        println!(
+        eprintln!(
             "{}error:{} {}",
             self.colors.bold_red,
             self.colors.reset,
@@ -33,7 +33,7 @@ impl Logger {
     }
 
     pub fn log_warning(&self, warning_type: &str) {
-        println!(
+        eprintln!(
             "{}warning:{} {}",
             self.colors.bold_yellow,
             self.colors.reset,

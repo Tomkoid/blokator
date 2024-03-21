@@ -39,13 +39,13 @@ pub fn adb_exists() {
         Ok(_) => {}
         Err(e) => {
             if e.kind() == ErrorKind::NotFound {
-                println!(
+                eprintln!(
                     "{}error:{} ADB command doesn't exist",
                     colors.bold_red, colors.reset
                 );
                 exit(1);
             } else {
-                println!(
+                eprintln!(
                     "{}error:{} Some strange error occurred",
                     colors.bold_red, colors.reset
                 );

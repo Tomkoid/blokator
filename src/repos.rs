@@ -63,7 +63,7 @@ pub fn add_repo(repo: &String, app_state: &AppState) {
 
     for i in output.lines() {
         if i == repo {
-            println!(
+            eprintln!(
                 "{}error:{} The repo you're trying to add already exists in repos list.",
                 colors.bold_red, colors.reset
             );
@@ -92,7 +92,7 @@ pub fn del_repo(repo: String) {
     if Path::new(&repos_file_location).exists() {
         let mut repos = read_file_to_string(&repos_file_location).unwrap();
         if !repos.contains(&repo) {
-            println!(
+            eprintln!(
                 "{}error:{} The repo you're trying to delete doesn't exist",
                 colors.bold_red, colors.reset
             );
@@ -105,7 +105,7 @@ pub fn del_repo(repo: String) {
             colors.bold_green, colors.reset, repo
         );
     } else {
-        println!(
+        eprintln!(
             "{}error:{} Failed to delete {} from the repo list, because the repo list doesn't exist.",
             colors.bold_red,
             colors.reset,

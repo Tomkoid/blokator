@@ -45,7 +45,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
     match device_ready(android_device) {
         true => {}
         false => {
-            println!(
+            eprintln!(
                 "{}error:{} Device is not ready.",
                 colors.bold_red, colors.reset
             );
@@ -105,7 +105,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !push_sdcard.success() {
-        println!(
+        eprintln!(
             "{}error:{} Cannot push the hosts file to the Android device",
             colors.bold_red, colors.reset
         );
@@ -141,7 +141,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !copy_etc_hosts.success() {
-        println!(
+        eprintln!(
             "{}error:{} Cannot make a backup of the hosts file",
             colors.bold_red, colors.reset
         );
@@ -173,7 +173,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !move_to_etc_hosts.success() {
-        println!(
+        eprintln!(
             "{}error:{} Cannot apply the hosts file",
             colors.bold_red, colors.reset
         );
@@ -206,7 +206,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
         .unwrap();
 
     if !mount_system_as_ro.success() {
-        println!(
+        eprintln!(
             "{}error:{} Failed to mount the system as read only",
             colors.bold_yellow, colors.reset
         );
@@ -222,7 +222,7 @@ pub fn apply_android(app_state: &AppState, android_device: &String) {
 
     // If send_notification was unsuccessful
     if !send_notification(android_device) {
-        println!("{}error{}", colors.bold_yellow, colors.reset);
+        eprintln!("{}error{}", colors.bold_yellow, colors.reset);
         exit(0);
     }
 

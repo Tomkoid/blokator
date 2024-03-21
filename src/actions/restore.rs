@@ -10,7 +10,7 @@ pub fn restore_backup(app_state: &AppState) {
     let messages = &app_state.messages;
 
     if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
-        println!(
+        eprintln!(
             "  {}>{} {}",
             colors.bold_red,
             colors.reset,
@@ -21,7 +21,7 @@ pub fn restore_backup(app_state: &AppState) {
     if read_file_to_string(HOSTS_FILE_BACKUP_PATH).unwrap()
         == read_file_to_string(HOSTS_FILE).unwrap()
     {
-        println!(
+        eprintln!(
             "  {}>{} {}",
             colors.bold_yellow,
             colors.reset,

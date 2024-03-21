@@ -25,7 +25,7 @@ pub fn list_devices(app_state: &AppState) {
     }
 
     if lines == 2 {
-        println!("No device found");
+        eprintln!("No device found");
         exit(1);
     }
 

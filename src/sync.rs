@@ -35,13 +35,13 @@ pub fn sync(repo: &str, args: &Args) -> bool {
         },
         Err(e) => {
             if e.is_timeout() {
-                println!(
+                eprintln!(
                     "\n{}error:{} Connection failed. (Check your internet connection): {}",
                     colors.bold_red, colors.reset, e,
                 );
                 exit(1)
             } else if e.is_connect() {
-                println!(
+                eprintln!(
                     "\n{}error:{} Couldn't connect to the server. Please check your internet connection: {}",
                     colors.bold_red,
                     colors.reset,
@@ -49,7 +49,7 @@ pub fn sync(repo: &str, args: &Args) -> bool {
                 );
                 exit(1)
             } else {
-                println!(
+                eprintln!(
                     "\n{}error:{} Error occurred: {}",
                     colors.bold_red, colors.reset, e,
                 );

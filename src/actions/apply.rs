@@ -11,13 +11,13 @@ pub fn apply_hosts(app_state: &AppState) {
 
     let local_hosts = format!("{}/hosts", get_data_dir());
     if !Path::new(&local_hosts).exists() {
-        println!(
+        eprintln!(
             "  [{}*{}] {}",
             colors.bold_red,
             colors.reset,
             messages.message.get("local_hosts_missing").unwrap()
         );
-        println!(
+        eprintln!(
             "  {}HELP:{} {}",
             colors.bold_green,
             colors.reset,
@@ -25,7 +25,7 @@ pub fn apply_hosts(app_state: &AppState) {
         );
         exit(1);
     } else if !Path::new(HOSTS_FILE).exists() {
-        println!(
+        eprintln!(
             "  [{}*{}] {}",
             colors.bold_red,
             colors.reset,
@@ -34,7 +34,7 @@ pub fn apply_hosts(app_state: &AppState) {
         exit(1);
     }
     if read_file_to_string(HOSTS_FILE).unwrap() == read_file_to_string(&local_hosts).unwrap() {
-        println!(
+        eprintln!(
             "  [{}*{}] {}",
             colors.bold_yellow,
             colors.reset,
