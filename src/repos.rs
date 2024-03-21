@@ -1,5 +1,5 @@
+use crate::actions::Colors;
 use crate::get_data_dir;
-use crate::initialize_colors::initialize_colors;
 use crate::read_file_to_string;
 use crate::tor::if_onion_link;
 use crate::write::write_to_file;
@@ -8,7 +8,7 @@ use std::path::Path;
 use std::process::exit;
 
 fn verify_repo(repo: &String, args: &Args) {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
 
@@ -55,7 +55,7 @@ pub fn list_repos() -> Vec<String> {
 }
 
 pub fn add_repo(repo: &String, args: &Args) {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     let file_location = format!("{}/repos", get_data_dir());
     let mut output = read_file_to_string(&file_location).unwrap();
@@ -84,7 +84,7 @@ pub fn add_repo(repo: &String, args: &Args) {
 }
 
 pub fn del_repo(repo: String) {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     let repos_file_location = format!("{}/repos", get_data_dir());
 

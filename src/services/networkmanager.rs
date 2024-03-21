@@ -1,10 +1,10 @@
-use crate::initialize_colors::initialize_colors;
+use crate::actions::Colors;
 use crate::services::init::Init;
 use crate::services::init::NetworkManager;
 use crate::Messages;
 
 pub fn restart_networkmanager() {
-    let colors = initialize_colors();
+    let colors = Colors::new();
     let messages: Messages = Messages::new();
 
     if NetworkManager::exists() {

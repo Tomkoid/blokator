@@ -2,8 +2,8 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
+use crate::actions::Colors;
 use crate::get_data_dir;
-use crate::initialize_colors::initialize_colors;
 use crate::write::write_to_file;
 
 pub fn already_initialized() -> bool {
@@ -21,7 +21,7 @@ pub fn already_initialized() -> bool {
 }
 
 pub fn initialize_dir() {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     fs::create_dir_all(get_data_dir()).unwrap_or_else(|e| {
         println!(

@@ -1,4 +1,4 @@
-use crate::initialize_colors;
+use crate::actions::Colors;
 use crate::messages::Messages;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -16,7 +16,7 @@ impl Presets {
 
     pub fn get(query: String) -> String {
         let messages = Messages::new();
-        let colors = initialize_colors();
+        let colors = Colors::new();
         let presets = Self::new();
 
         let preset_url = presets.preset.get(&query);

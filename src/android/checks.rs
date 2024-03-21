@@ -1,4 +1,4 @@
-use crate::initialize_colors;
+use crate::actions::Colors;
 use std::io::ErrorKind;
 use std::process::exit;
 use std::process::Command;
@@ -33,7 +33,7 @@ pub fn device_ready(device: &str) -> bool {
 }
 
 pub fn adb_exists() {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     match Command::new("adb").stdout(Stdio::piped()).spawn() {
         Ok(_) => {}
