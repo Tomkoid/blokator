@@ -1,4 +1,4 @@
-<div align="center"><h1>Blokator - Simple system-wide CLI adblocker</h1></div>
+<div align="center"><h1>Blokator - System-wide CLI adblocker</h1></div>
 
 [![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
 
@@ -88,7 +88,7 @@ cargo install blokator
 First, you need to clone the [git repo](https://codeberg.org/Tomkoid/blokator) to your local machine:
 
 ```
-git clone https://gitlab.com/Tomkoid/blokator.git
+git clone https://codeberg.org/tomkoid/blokator.git
 ```
 
 Now go to the new cloned directory:
