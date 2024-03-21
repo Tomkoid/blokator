@@ -1,5 +1,6 @@
 use crate::actions::Colors;
 use crate::messages::Messages;
+use crate::AppState;
 
 use std::process::exit;
 use std::process::Command;
@@ -36,9 +37,9 @@ pub fn send_notification(android_device: &String) -> bool {
     result.success()
 }
 
-pub fn apply_android(android_device: &String) {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn apply_android(app_state: &AppState, android_device: &String) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
 
     adb_exists();
     match device_ready(android_device) {

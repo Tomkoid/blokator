@@ -1,10 +1,10 @@
-use crate::{Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH};
+use crate::{Actions, AppState, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH};
 
 use super::*;
 
-pub fn backup() {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn backup(app_state: &AppState) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
 
     copy(HOSTS_FILE, HOSTS_FILE_BACKUP_PATH, Actions::Backup);
     println!(

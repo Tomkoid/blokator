@@ -1,12 +1,13 @@
 use crate::{
-    services::networkmanager::restart_networkmanager, Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH,
+    services::networkmanager::restart_networkmanager, Actions, AppState, HOSTS_FILE,
+    HOSTS_FILE_BACKUP_PATH,
 };
 
 use super::*;
 
-pub fn restore_backup() {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn restore_backup(app_state: &AppState) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
 
     if !Path::new(HOSTS_FILE_BACKUP_PATH).exists() {
         println!(

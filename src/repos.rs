@@ -3,12 +3,13 @@ use crate::get_data_dir;
 use crate::read_file_to_string;
 use crate::tor::if_onion_link;
 use crate::write::write_to_file;
-use crate::Args;
+use crate::AppState;
 use std::path::Path;
 use std::process::exit;
 
-fn verify_repo(repo: &String, args: &Args) {
-    let colors = Colors::new();
+fn verify_repo(repo: &String, app_state: &AppState) {
+    let colors = &app_state.colors;
+    let args = &app_state.args;
 
     let mut client = reqwest::blocking::ClientBuilder::new();
 
@@ -54,8 +55,8 @@ pub fn list_repos() -> Vec<String> {
     repos_list
 }
 
-pub fn add_repo(repo: &String, args: &Args) {
-    let colors = Colors::new();
+pub fn add_repo(repo: &String, app_state: &AppState) {
+    let colors = &app_state.colors;
 
     let file_location = format!("{}/repos", get_data_dir());
     let mut output = read_file_to_string(&file_location).unwrap();
@@ -73,7 +74,7 @@ pub fn add_repo(repo: &String, args: &Args) {
     output = format!("{}\n{}", output, repo);
 
     // Check if the repo responds
-    verify_repo(repo, args);
+    verify_repo(repo, &app_state);
 
     write_to_file(&file_location, output);
 

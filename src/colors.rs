@@ -1,5 +1,6 @@
 use std::env;
 
+#[derive(Debug, Clone)]
 pub struct Colors {
     pub bold_white: String,
     pub bold_gray: String,

@@ -1,12 +1,13 @@
 use crate::{
-    services::networkmanager::restart_networkmanager, Actions, HOSTS_FILE, HOSTS_FILE_BACKUP_PATH,
+    services::networkmanager::restart_networkmanager, Actions, AppState, HOSTS_FILE,
+    HOSTS_FILE_BACKUP_PATH,
 };
 
 use super::*;
 
-pub fn apply_hosts(_args: Args) {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn apply_hosts(app_state: &AppState) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
 
     let local_hosts = format!("{}/hosts", get_data_dir());
     if !Path::new(&local_hosts).exists() {

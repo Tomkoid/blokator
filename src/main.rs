@@ -15,6 +15,7 @@ mod copy;
 pub mod error;
 mod handle_permissions;
 mod initialize_dirs;
+pub mod logging;
 pub mod messages;
 pub mod presets;
 pub mod read;
@@ -28,6 +29,7 @@ pub mod write;
 mod windows;
 
 use crate::commands::exec_command;
+use crate::logging::Logger;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 use arguments::Args;
@@ -58,6 +60,13 @@ pub enum Actions {
     Apply,
 }
 
+pub struct AppState {
+    pub args: Args,
+    pub logger: Logger,
+    pub colors: Colors,
+    pub messages: Messages,
+}
+
 fn main() {
     // Initialize colors
     let colors = Colors::new();
@@ -65,34 +74,49 @@ fn main() {
     // Initialize messages
     let messages: Messages = Messages::new();
 
+    // Initialize logger
+    let logger = Logger::new(&colors, &messages);
+
     // Parse arguments
     let args = Args::parse();
 
+    // Initialize state
+    let state = AppState {
+        args: args.clone(),
+        logger: logger.clone(),
+        colors: colors.clone(),
+        messages: messages.clone(),
+    };
+
     // Check if user is running blokator as root / administrator, otherwise exit
-    handle_permissions();
+    handle_permissions(&state);
 
     // Initialize important directories if they are not already initialized
     if !already_initialized() {
         initialize_dir();
     }
 
-    exec_command(&args);
+    exec_command(&state);
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);
 
-    println!(
-        "{}error:{} {}",
-        colors.bold_red,
-        colors.reset,
-        messages.message.get("no_action_specified").unwrap()
-    );
-    println!(
-        "{}HELP:{} {}",
-        colors.bold_green,
-        colors.reset,
-        messages.help_message.get("no_action_specified").unwrap()
-    );
+    logger.log_error("no_action_specified");
+    logger.log_help("no_action_specified");
+
+    // println!(
+    //     "{}error:{} {}",
+    //     colors.bold_red,
+    //     colors.reset,
+    //     messages.message.get("no_action_specified").unwrap()
+    // );
+    //
+    // println!(
+    //     "{}HELP:{} {}",
+    //     colors.bold_green,
+    //     colors.reset,
+    //     messages.help_message.get("no_action_specified").unwrap()
+    // );
     exit(1);
 }
 

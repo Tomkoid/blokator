@@ -1,8 +1,11 @@
+use crate::AppState;
+
 use super::*;
 
-pub fn sync_repositories(args: Args) {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn sync_repositories(app_state: &AppState) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
+    let args = &app_state.args;
 
     // Sync all repositories
     let repos_file_location = format!("{}/repos", get_data_dir());

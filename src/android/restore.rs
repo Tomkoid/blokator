@@ -1,6 +1,6 @@
 use std::process::{exit, Command, Stdio};
 
-use crate::{actions::Colors, messages::Messages};
+use crate::AppState;
 
 use super::{
     checks::{adb_exists, device_ready},
@@ -9,9 +9,9 @@ use super::{
 
 use spinners::Spinner;
 
-pub fn restore_android(android_device: &String) {
-    let colors = Colors::new();
-    let messages = Messages::new();
+pub fn restore_android(app_state: &AppState, android_device: &String) {
+    let colors = &app_state.colors;
+    let messages = &app_state.messages;
 
     adb_exists();
     match device_ready(android_device) {

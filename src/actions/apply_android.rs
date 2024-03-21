@@ -1,12 +1,12 @@
-use crate::android::apply::apply_android;
+use crate::{android::apply::apply_android, AppState};
 
 use super::*;
 
-pub fn apply_android_action(android_device: String) {
+pub fn apply_android_action(app_state: &AppState, android_device: String) {
     let colors = Colors::new();
     let messages = Messages::new();
 
-    apply_android(&android_device);
+    apply_android(app_state, &android_device);
     println!(
         "[{}+{}] {}",
         colors.bold_green,
