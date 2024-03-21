@@ -1,10 +1,10 @@
 use std::fs;
 use std::process::exit;
 
-use crate::initialize_colors::initialize_colors;
+use crate::actions::Colors;
 
 pub fn write_to_file(path: &str, contents: String) {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     fs::write(path, contents).unwrap_or_else(|e| {
         println!(

@@ -2,12 +2,12 @@ use std::process::exit;
 use std::process::Command;
 use std::process::Stdio;
 
-use crate::initialize_colors::initialize_colors;
+use crate::actions::Colors;
 
 use super::checks::adb_exists;
 
 pub fn list_devices() {
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     adb_exists();
 

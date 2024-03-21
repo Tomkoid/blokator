@@ -29,7 +29,6 @@ pub mod write;
 mod windows;
 
 use crate::commands::exec_command;
-use crate::initialize_colors::initialize_colors;
 #[cfg(target_family = "windows")]
 use crate::windows::is_elevated;
 use arguments::Args;
@@ -62,7 +61,7 @@ pub enum Actions {
 
 fn main() {
     // Initialize colors
-    let colors = initialize_colors();
+    let colors = Colors::new();
 
     // Initialize messages
     let messages: Messages = Messages::new();

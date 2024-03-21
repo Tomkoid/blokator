@@ -14,7 +14,25 @@ pub struct Colors {
 }
 
 impl Colors {
-    pub fn new() -> Colors {
+    pub fn new() -> Self {
+        #[cfg(target_family = "windows")]
+        return Colors::new_without_colors();
+
+        #[cfg(target_family = "unix")]
+        {
+            let mut colors = Self::get_colors_without_colors();
+
+            // If user runs blokator with NO_COLOR flag
+            #[cfg(target_family = "unix")]
+            if !Self::check_no_color_env() {
+                colors = Self::get_colors();
+            }
+
+            colors
+        }
+    }
+
+    fn get_colors() -> Self {
         Colors {
             bold_white: "\x1b[1;40m".to_string(),
             bold_gray: "\x1b[1;90m".to_string(),
@@ -29,7 +47,8 @@ impl Colors {
         }
     }
 
-    pub fn new_without_colors() -> Colors {
+    // great name lol
+    fn get_colors_without_colors() -> Self {
         Colors {
             bold_white: "".to_string(),
             bold_gray: "".to_string(),
@@ -43,20 +62,20 @@ impl Colors {
             reset: "".to_string(),
         }
     }
+
+    pub fn check_no_color_env() -> bool {
+        let no_color_env = env::var_os("NO_COLOR");
+
+        if no_color_env.is_none() {
+            return false;
+        }
+
+        env::var_os("NO_COLOR").unwrap() == "1" || env::var_os("NO_COLOR").unwrap() == "true"
+    }
 }
 
 impl Default for Colors {
     fn default() -> Self {
         Self::new()
     }
-}
-
-pub fn check_no_color_env() -> bool {
-    let no_color_env = env::var_os("NO_COLOR");
-
-    if no_color_env.is_none() {
-        return false;
-    }
-
-    env::var_os("NO_COLOR").unwrap() == "1" || env::var_os("NO_COLOR").unwrap() == "true"
 }

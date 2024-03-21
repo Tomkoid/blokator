@@ -1,7 +1,6 @@
-use crate::initialize_colors;
 use std::process::exit;
 
-use crate::Messages;
+use crate::{actions::Colors, Messages};
 
 #[cfg(target_family = "unix")]
 use nix::unistd::Uid;
@@ -10,7 +9,7 @@ use nix::unistd::Uid;
 use crate::is_elevated;
 
 pub fn handle_permissions() {
-    let colors = initialize_colors();
+    let colors = Colors::new();
     let messages: Messages = Messages::new();
 
     // Check if the program is running with root permissions
