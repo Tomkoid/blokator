@@ -14,7 +14,6 @@ mod commands;
 mod copy;
 pub mod error;
 mod handle_permissions;
-mod initialize_colors;
 mod initialize_dirs;
 pub mod messages;
 pub mod presets;
