@@ -88,7 +88,7 @@ cargo install blokator
 First, you need to clone the [git repo](https://codeberg.org/Tomkoid/blokator) to your local machine:
 
 ```
-git clone https://gitlab.com/Tomkoid/blokator.git
+git clone https://codeberg.org/tomkoid/blokator.git
 ```
 
 Now go to the new cloned directory:
