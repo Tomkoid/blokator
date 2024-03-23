@@ -1,0 +1,6 @@
+steps:
+  - name: build
+    image: rust
+    commands:
+      - cargo check
+      - cargo test
