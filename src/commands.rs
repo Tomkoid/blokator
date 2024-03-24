@@ -12,11 +12,11 @@ use crate::{
 
 use crate::actions::sync::sync_repositories;
 
-pub fn exec_command(app_state: &AppState) {
+pub async fn exec_command(app_state: &AppState) {
     let args = &app_state.args;
 
     match args.to_owned().command {
-        Commands::Sync(_) => sync_repositories(&app_state),
+        Commands::Sync(_) => sync_repositories(&app_state).await,
         Commands::Apply => apply_hosts(&app_state),
         Commands::ApplyAndroid(a) => apply_android_action(&app_state, a.device),
         Commands::Backup => backup(&app_state),

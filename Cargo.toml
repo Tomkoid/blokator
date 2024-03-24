@@ -26,6 +26,7 @@ regex = "1.7.0"
 reqwest = { version = "0.11.11", features = ["blocking", "socks"] }
 serde = { version = "1.0.147", features = ["derive"] }
 spinners = "4.1.0"
+tokio = { version = "1.36.0", features = ["rt", "full"] }
 toml = "0.5.9"
 
 [target.'cfg(unix)'.dependencies]
