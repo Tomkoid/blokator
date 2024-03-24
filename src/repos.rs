@@ -74,7 +74,7 @@ pub fn add_repo(repo: &String, app_state: &AppState) {
     output = format!("{}\n{}", output, repo);
 
     // Check if the repo responds
-    verify_repo(repo, &app_state);
+    verify_repo(repo, app_state);
 
     write_to_file(&file_location, output);
 
