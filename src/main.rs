@@ -60,6 +60,7 @@ pub enum Actions {
     Apply,
 }
 
+#[derive(Clone)]
 pub struct AppState {
     pub args: Args,
     pub logger: Logger,
@@ -67,7 +68,8 @@ pub struct AppState {
     pub messages: Messages,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Initialize colors
     let colors = Colors::new();
 
@@ -96,7 +98,7 @@ fn main() {
         initialize_dir();
     }
 
-    exec_command(&state);
+    exec_command(&state).await;
 
     // Check if allowed exit functions ended (else exit)
     check_allowed_function(&args);

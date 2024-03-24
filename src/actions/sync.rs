@@ -1,11 +1,12 @@
+use std::sync::Arc;
+
 use crate::AppState;
 
 use super::*;
 
-pub fn sync_repositories(app_state: &AppState) {
+pub async fn sync_repositories(app_state: &AppState) {
     let colors = &app_state.colors;
     let messages = &app_state.messages;
-    let args = &app_state.args;
 
     // Sync all repositories
     let repos_file_location = format!("{}/repos", get_data_dir());
@@ -29,41 +30,42 @@ pub fn sync_repositories(app_state: &AppState) {
         );
         std::process::exit(1);
     }
+
+    println!(
+        "{}{}{} {}{}",
+        colors.bold_blue,
+        messages.message.get("syncing").unwrap(),
+        colors.reset,
+        colors.green,
+        colors.reset
+    );
+
+    let mut thread_joins: Vec<tokio::task::JoinHandle<String>> = Vec::new();
+
     for repo in repos.lines() {
         if repo.is_empty() {
             continue;
         }
 
-        // print!(
-        //     "  [{}*{}] {} {}.. ",
-        //     colors.bold_blue,
-        //     colors.reset,
-        //     messages.message.get("syncing").unwrap(),
-        //     repo,
-        // );
+        let repo = repo.to_string();
 
-        let mut syncing_spinner = Spinner::new(
-            SPINNER_TYPE,
-            format!(
-                "{}{}{} {}{}{}",
-                colors.bold_blue,
-                messages.message.get("syncing").unwrap(),
-                colors.reset,
-                colors.green,
-                repo,
-                colors.reset
-            ),
-        );
+        let app_state_cloned = app_state.clone();
 
-        std::io::stdout().flush().unwrap();
+        let thread_handle = tokio::task::spawn_blocking(move || sync_repo(repo, &app_state_cloned));
 
-        let error = sync(repo, &args);
+        thread_joins.push(thread_handle);
+    }
 
-        if !error {
-            syncing_spinner.stop_with_newline();
-        } else {
-            println!("{}error{}", colors.bold_red, colors.reset);
+    for thread_join in thread_joins {
+        let thread_join = thread_join.await;
+
+        if thread_join.is_err() {
+            eprintln!("  {}> error{}", colors.bold_red, colors.reset);
         }
+
+        let result = thread_join.unwrap();
+
+        println!("  {}>{} {}", colors.bold_green, colors.reset, result);
     }
 
     let changed = local_hosts_output != read_file_to_string(&local_hosts).unwrap();
@@ -81,4 +83,27 @@ pub fn sync_repositories(app_state: &AppState) {
     }
 
     exit(0);
+}
+
+fn sync_repo(repo: String, app_state: &AppState) -> String {
+    // print!(
+    //     "  [{}*{}] {} {}.. ",
+    //     colors.bold_blue,
+    //     colors.reset,
+    //     messages.message.get("syncing").unwrap(),
+    //     repo,
+    // );
+
+    std::io::stdout().flush().unwrap();
+
+    let error = sync(&repo, &app_state.args);
+
+    if error {
+        eprintln!(
+            "  {}> error{}",
+            app_state.colors.bold_red, app_state.colors.reset
+        );
+    }
+
+    repo
 }
