@@ -1,6 +1,7 @@
 #![allow(unreachable_code)]
 
 use clap::Parser;
+use config::Config;
 use dirs::home_dir;
 
 use std::process::exit;
@@ -11,6 +12,7 @@ mod android;
 mod arguments;
 pub mod colors;
 mod commands;
+pub mod config;
 mod copy;
 pub mod error;
 mod handle_permissions;
@@ -63,6 +65,7 @@ pub enum Actions {
 #[derive(Clone)]
 pub struct AppState {
     pub args: Args,
+    pub config: Config,
     pub logger: Logger,
     pub colors: Colors,
     pub messages: Messages,
@@ -82,9 +85,13 @@ async fn main() {
     // Parse arguments
     let args = Args::parse();
 
+    // Initialize config
+    let config = Config::new(&colors);
+
     // Initialize state
     let state = AppState {
         args: args.clone(),
+        config,
         logger: logger.clone(),
         colors: colors.clone(),
         messages: messages.clone(),
