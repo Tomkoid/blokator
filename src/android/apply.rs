@@ -1,5 +1,3 @@
-use crate::actions::Colors;
-use crate::messages::Messages;
 use crate::AppState;
 
 use std::process::exit;
