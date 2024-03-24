@@ -89,6 +89,7 @@ dependencies = [
  "serde",
  "signal-hook",
  "spinners",
+ "tokio",
  "toml",
  "winapi",
 ]
