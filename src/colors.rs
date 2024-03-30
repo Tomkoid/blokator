@@ -17,7 +17,7 @@ pub struct Colors {
 impl Colors {
     pub fn new() -> Self {
         #[cfg(target_family = "windows")]
-        return Colors::new_without_colors();
+        return Colors::get_colors_without_colors();
 
         #[cfg(target_family = "unix")]
         {
@@ -33,6 +33,7 @@ impl Colors {
         }
     }
 
+    #[cfg(target_family = "unix")]
     fn get_colors() -> Self {
         Colors {
             bold_white: "\x1b[1;40m".to_string(),

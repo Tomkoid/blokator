@@ -8,6 +8,7 @@ pub async fn sync_repositories(app_state: &AppState) {
 
     // Sync all repositories
     let repos_file_location = format!("{}/repos", get_data_dir());
+    #[cfg(target_family = "unix")]
     let hosts_temp = "/tmp/blokator".to_string();
 
     let local_hosts = format!("{}/hosts", get_data_dir());
