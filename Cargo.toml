@@ -1,12 +1,12 @@
 [package]
 name = "blokator"
-version = "0.5.3"
+version = "1.0.0"
 edition = "2021"
-description = "Simple system-wide adblocker"
+description = "System-wide adblocker"
 readme = "README.md"
 repository = "https://gitlab.com/Tomkoid/blokator"
-authors = ["Tomkoid <tomkoid@tomkoid.tk>"]
-license = "GPL-3.0"
+authors = ["Tomkoid <tomaszierl@outlook.com>"]
+license = "MIT"
 keywords = ["blokator", "system", "wide", "hosts", "adblocker"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
