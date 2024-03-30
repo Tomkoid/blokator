@@ -1,6 +1,6 @@
 <div align="center"><h1>Blokator - System-wide CLI adblocker</h1></div>
 
-[![asciicast](https://asciinema.org/a/520298.svg)](https://asciinema.org/a/520298)
+[![asciicast](https://asciinema.org/a/649867.svg)](https://asciinema.org/a/649867)
 
 ## How it works
 Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresses, which acts like local DNS server.
