@@ -1,6 +1,6 @@
 .\" Manpage for Blokator.
-.\" Contact tomkoid@proton.me to correct errors or typos.
-.TH man 1 "19 Oct 2022" "0.5.1" "blokator man page"
+.\" Contact tomaszierl@outlook.com to correct errors or typos.
+.TH man 1 "30 Mar 2024" "1.0.0" "blokator man page"
 .SH NAME
 blokator \- block all ads and spam on your system
 .SH SYNOPSIS
