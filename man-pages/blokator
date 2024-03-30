@@ -6,13 +6,13 @@ blokator \- block all ads and spam on your system
 .SH SYNOPSIS
 \f[B]blokator\f[R] [OPTIONS]
 .SH DESCRIPTION
-Simple cross-platform and system-wide CLI adblocker
+Cross-platform and system-wide CLI adblocker
 
 Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresses, which acts like local DNS server.
 
 All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 .SH OPTIONS
-\f[B]sync [DOWNLOAD_OPTIONS] [TOR_OPTIONS]\f[R] - sync all added repositories
+\f[B][TOR_OPTIONS] sync\f[R] - sync all added repositories
 
 \f[B]apply\f[R] - after sync, apply all changes
 
@@ -27,11 +27,10 @@ All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 \f[B]del-repo [RAW HOSTS FILE TXT URL]\f[R] - remove additonal repository
 
 \f[B]del-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - remove additional repository from preset
-.SH DOWNLOAD_OPTIONS (optional)
+
+.SH TOR_OPTIONS (optional)
 \f[B]-t, --tor\f[R] - use tor when getting data from onion service
 
-\f[B]-A, -tor-all\f[R] - use tor for all websites (-t, --tor argument required)
-.SH TOR_OPTIONS (optional)
 \f[B]--tor-bind-address [IP]\f[R] - specify tor proxy ip address (default: 127.0.0.1)
 
 \f[B]--tor-port [PORT]\f[R] - specify tor proxy port (default: 9050)
