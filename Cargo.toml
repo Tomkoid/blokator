@@ -35,3 +35,11 @@ signal-hook = "0.3.14"
 [target.'cfg(windows)'.dependencies]
 winapi = {version = "0.3.8", features = ["winuser", "handleapi", "processthreadsapi", "securitybaseapi"]}
 libc = "0.2.66"
+
+[workspace.metadata.cross.target.aarch64-linux-android]
+# Install libssl-dev:arm64, see <https://github.com/cross-rs/cross/blob/main/docs/custom_images.md#adding-dependencies-to-existing-images>
+pre-build = [
+    "dpkg --add-architecture $CROSS_DEB_ARCH", 
+    "apt-get update && apt-get --assume-yes install libssl-dev:$CROSS_DEB_ARCH",
+    "apt-get --assume-yes install libc6:$CROSS_DEB_ARCH glibc-source:$CROSS_DEB_ARCH",
+]
