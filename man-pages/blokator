@@ -12,29 +12,21 @@ Blokator is hosts-based. The hosts file is a way to map hostnames to IP addresse
 
 All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 .SH OPTIONS
-\f[B]-s, --sync [DOWNLOAD_OPTIONS] [TOR_OPTIONS]\f[R] - sync all added repositories
+\f[B]sync [DOWNLOAD_OPTIONS] [TOR_OPTIONS]\f[R] - sync all added repositories
 
-\f[B]-a, --apply\f[R] - after sync, apply all changes
+\f[B]apply\f[R] - after sync, apply all changes
 
-\f[B]--apply-android [ANDROID_OPTIONS]\f[R] - after sync, apply all changes to specified Android device (Blokator must be compiled with `android` feature)
+\f[B]restore\f[R] - restore backup of hosts file (creates automatically when applying)
 
-\f[B]--list-devices\f[R] - list all connected Android devices including \f[B]DEVICE_ID\f[R]
+\f[B]backup\f[R] - create a manual backup
 
-\f[B]-r, --restore\f[R] - restore backup of hosts file (creates automatically when applying)
+\f[B]add-repo [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository
 
-\f[B]--restore-android [ANDROID_OPTIONS]\f[R] - restore backup of hosts file on Android (Blokator must be compiled with `android` feature)
+\f[B]add-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository from preset
 
-\f[B]-b, --backup\f[R] - create a manual backup
+\f[B]del-repo [RAW HOSTS FILE TXT URL]\f[R] - remove additonal repository
 
-\f[B]-m, --add-repo [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository
-
-\f[B]-M, --add-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository from preset
-
-\f[B]-d, --del-repo [RAW HOSTS FILE TXT URL]\f[R] - remove additonal repository
-
-\f[B]-D, --del-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - add additional repository from preset
-.SH ANDROID_OPTIONS (required)
-\f[B]--android-device [DEVICE_ID]\f[R] - specify android device
+\f[B]del-repo-preset [DOWNLOAD_OPTIONS] [TOR_OPTIONS] [RAW HOSTS FILE TXT URL] \f[R] - remove additional repository from preset
 .SH DOWNLOAD_OPTIONS (optional)
 \f[B]-t, --tor\f[R] - use tor when getting data from onion service
 
@@ -46,4 +38,4 @@ All data is stored in \f[B]/root/.local/share/adblocker\f[R].
 .SH BUGS
 No known bugs.
 .SH AUTHOR
-Tomkoid (tomkoid@proton.me)
+Tomkoid (tomaszierl@outlook.com)
