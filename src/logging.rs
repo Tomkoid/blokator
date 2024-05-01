@@ -1,52 +1,62 @@
-use crate::actions::{Colors, Messages};
+use colored::Colorize;
+
+use crate::actions::Messages;
 
 #[derive(Debug, Clone)]
 pub struct Logger {
-    colors: Colors,
     messages: Messages,
 }
 
+#[derive(Debug, PartialEq)]
+enum LogType {
+    Error,
+    Help,
+    Warning,
+    Info,
+}
+
 impl Logger {
-    pub fn new(colors: &Colors, messages: &Messages) -> Self {
+    pub fn new(messages: &Messages) -> Self {
         Self {
-            colors: colors.clone(),
-            messages: messages.clone(),
+            messages: messages.to_owned(),
         }
     }
 
     pub fn log_error(&self, error_type: &str) {
-        eprintln!(
-            "{}error:{} {}",
-            self.colors.bold_red,
-            self.colors.reset,
-            self.messages.message.get(error_type).unwrap()
-        );
+        self.log(LogType::Error, error_type);
     }
 
     pub fn log_help(&self, help_type: &str) {
-        println!(
-            "{}help:{} {}",
-            self.colors.bold_blue,
-            self.colors.reset,
-            self.messages.help_message.get(help_type).unwrap()
-        );
+        self.log(LogType::Help, help_type);
     }
 
     pub fn log_warning(&self, warning_type: &str) {
-        eprintln!(
-            "{}warning:{} {}",
-            self.colors.bold_yellow,
-            self.colors.reset,
-            self.messages.message.get(warning_type).unwrap()
-        );
+        self.log(LogType::Warning, warning_type);
     }
 
     pub fn log_info(&self, info_type: &str) {
-        println!(
-            "{}info:{} {}",
-            self.colors.bold_green,
-            self.colors.reset,
-            self.messages.message.get(info_type).unwrap()
-        );
+        self.log(LogType::Info, info_type);
+    }
+
+    fn log(&self, message_type: LogType, message: &str) {
+        let start = match message_type {
+            LogType::Error => "error:".bold().red(),
+            LogType::Help => "help:".bold().blue(),
+            LogType::Warning => "warning:".bold().yellow(),
+            LogType::Info => "info:".bold().green(),
+        };
+
+        let message_content = match message_type {
+            LogType::Error => self.messages.message.get(message).unwrap(),
+            LogType::Help => self.messages.help_message.get(message).unwrap(),
+            LogType::Warning => self.messages.message.get(message).unwrap(),
+            LogType::Info => self.messages.message.get(message).unwrap(),
+        };
+
+        if message_type == LogType::Error || message_type == LogType::Warning {
+            eprintln!("{} {}", start, message_content)
+        } else {
+            println!("{} {}", start, message_content)
+        }
     }
 }

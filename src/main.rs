@@ -71,13 +71,13 @@ pub struct AppState {
 #[tokio::main]
 async fn main() {
     // Initialize colors
-    let colors = Colors::new();
+    let colors: Colors = Colors::new();
 
     // Initialize messages
     let messages: Messages = Messages::new();
 
     // Initialize logger
-    let logger = Logger::new(&colors, &messages);
+    let logger = Logger::new(&messages);
 
     // Parse arguments
     let args = Args::parse();

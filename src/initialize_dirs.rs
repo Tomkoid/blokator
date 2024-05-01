@@ -7,17 +7,16 @@ use crate::get_data_dir;
 use crate::write::write_to_file;
 
 pub fn already_initialized() -> bool {
-    let mut status: bool = true;
     if !Path::new(&(get_data_dir() + "/hosts")).exists() {
-        status = false
+        return false;
     };
     if !Path::new(&(get_data_dir() + "/repos")).exists() {
-        status = false
+        return false;
     };
     if !Path::new(&get_data_dir()).exists() {
-        status = false
+        return false;
     };
-    status
+    true
 }
 
 pub fn initialize_dir() {
