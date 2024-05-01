@@ -21,7 +21,7 @@ impl Presets {
 
         let preset_url = presets.preset.get(&query);
 
-        if presets.preset.get(&query).is_none() {
+        if !presets.preset.contains_key(&query) {
             println!(
                 "  {}>{} {}",
                 colors.bold_red,
