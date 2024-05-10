@@ -1,5 +1,4 @@
-use crate::actions::Colors;
-use crate::messages::Messages;
+use crate::logging::get_global_logger;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::process::exit;
@@ -15,19 +14,13 @@ impl Presets {
     }
 
     pub fn get(query: String) -> String {
-        let messages = Messages::new();
-        let colors = Colors::new();
+        let logger = get_global_logger();
         let presets = Self::new();
 
         let preset_url = presets.preset.get(&query);
 
         if !presets.preset.contains_key(&query) {
-            println!(
-                "  {}>{} {}",
-                colors.bold_red,
-                colors.reset,
-                messages.message.get("preset_notfound").unwrap()
-            );
+            logger.log_error("preset_notfound");
             exit(1)
         } else {
             preset_url.unwrap().to_string()

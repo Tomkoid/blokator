@@ -68,6 +68,11 @@ pub struct AppState {
     pub messages: Messages,
 }
 
+// global Logger
+thread_local! {
+    static LOGGER: Logger = Logger::new(&Messages::new());
+}
+
 #[tokio::main]
 async fn main() {
     // Initialize colors

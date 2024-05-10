@@ -1,12 +1,12 @@
 use std::io::ErrorKind;
 use std::process::exit;
 
-use crate::actions::Colors;
+use crate::logging::get_global_logger;
 use crate::messages::Messages;
 use crate::{read::read_file_to_string, write::write_to_file, Actions};
 
 pub fn copy(from: &str, to: &str, action: Actions) {
-    let colors = Colors::new();
+    let logger = get_global_logger();
 
     let messages: Messages = Messages::new();
 
@@ -20,36 +20,15 @@ pub fn copy(from: &str, to: &str, action: Actions) {
         Ok(s) => s,
         Err(e) => match e.kind() {
             ErrorKind::NotFound => {
-                eprintln!(
-                    "{}error:{} {}: {} (Kind: {})",
-                    colors.bold_red,
-                    colors.reset,
-                    not_found_message,
-                    e,
-                    e.kind()
-                );
+                logger.log_error(not_found_message);
                 exit(1)
             }
             ErrorKind::PermissionDenied => {
-                eprintln!(
-                    "{}error:{} {}: {} (Kind: {})",
-                    colors.bold_red,
-                    colors.reset,
-                    messages.message.get("permission_denied").unwrap(),
-                    e,
-                    e.kind()
-                );
+                logger.log_error("permission_denied");
                 exit(1)
             }
             _ => {
-                eprintln!(
-                    "{}error:{} {}: {} (Kind: {})",
-                    colors.bold_red,
-                    colors.reset,
-                    messages.message.get("unknown_error").unwrap(),
-                    e,
-                    e.kind()
-                );
+                logger.log_error("unknown_error");
                 exit(1)
             }
         },

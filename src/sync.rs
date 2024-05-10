@@ -1,5 +1,5 @@
-use crate::actions::Colors;
 use crate::error::check_http_error;
+use crate::logging::get_global_logger;
 use crate::tor::if_onion_link;
 use crate::Args;
 use crate::{get_data_dir, read::read_file_to_string, write::write_to_file};
@@ -7,7 +7,7 @@ use std::{path::Path, process::exit};
 
 // Returns true if error
 pub fn sync(repo: &str, args: &Args) -> bool {
-    let colors = Colors::new();
+    let logger = get_global_logger();
 
     let mut client = reqwest::blocking::ClientBuilder::new();
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
@@ -26,33 +26,25 @@ pub fn sync(repo: &str, args: &Args) -> bool {
         Ok(s) => match s.text() {
             Ok(resp) => resp,
             Err(e) => {
-                println!(
-                    "\n{}error:{} Failed to decode response: {}",
-                    colors.bold_red, colors.reset, e
-                );
+                logger.log_error(&format!("Failed to decode response: {}", e));
                 exit(1);
             }
         },
         Err(e) => {
             if e.is_timeout() {
-                eprintln!(
-                    "\n{}error:{} Connection failed. (Check your internet connection): {}",
-                    colors.bold_red, colors.reset, e,
-                );
+                logger.log_error(&format!(
+                    "Connection failed. (Check your internet connection): {}",
+                    e
+                ));
                 exit(1)
             } else if e.is_connect() {
-                eprintln!(
-                    "\n{}error:{} Couldn't connect to the server. Please check your internet connection: {}",
-                    colors.bold_red,
-                    colors.reset,
+                logger.log_error(&format!(
+                    "Couldn't connect to the server. (Check your internet connection): {}",
                     e
-                );
+                ));
                 exit(1)
             } else {
-                eprintln!(
-                    "\n{}error:{} Error occurred: {}",
-                    colors.bold_red, colors.reset, e,
-                );
+                logger.log_error(&format!("Error occurred: {}", e));
                 exit(1)
             }
         }

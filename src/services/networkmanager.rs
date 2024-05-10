@@ -27,9 +27,9 @@ pub fn restart_networkmanager() {
              * warning, which is the same exit code
              */
             if Init::get_init() == Some(Init::OpenRC) {
-                println!(" {}failed / warning{}", colors.bold_red, colors.reset);
+                eprintln!(" {}failed / warning{}", colors.bold_red, colors.reset);
             } else {
-                println!(" {}failed{}", colors.bold_red, colors.reset);
+                eprintln!(" {}failed{}", colors.bold_red, colors.reset);
             }
         }
     } else {

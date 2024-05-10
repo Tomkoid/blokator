@@ -2,8 +2,8 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
-use crate::actions::Colors;
 use crate::get_data_dir;
+use crate::logging::get_global_logger;
 use crate::write::write_to_file;
 
 pub fn already_initialized() -> bool {
@@ -20,16 +20,12 @@ pub fn already_initialized() -> bool {
 }
 
 pub fn initialize_dir() {
-    let colors = Colors::new();
-
     fs::create_dir_all(get_data_dir()).unwrap_or_else(|e| {
-        eprintln!(
-            "{}error:{} Error occurred when initializing dirs: {} (Kind: {})",
-            colors.bold_red,
-            colors.reset,
+        get_global_logger().log_error(&format!(
+            "Error occurred when initializing dirs: {} (Kind: {})",
             e,
             e.kind()
-        );
+        ));
         exit(1);
     });
 

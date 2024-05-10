@@ -1,5 +1,5 @@
-use crate::actions::Colors;
 use crate::get_data_dir;
+use crate::logging::get_global_logger;
 use crate::read_file_to_string;
 use crate::tor::if_onion_link;
 use crate::write::write_to_file;
@@ -7,11 +7,11 @@ use crate::AppState;
 use std::path::Path;
 use std::process::exit;
 
-fn verify_repo(repo: &String, app_state: &AppState) {
-    let colors = &app_state.colors;
+async fn verify_repo(repo: &String, app_state: &AppState) {
     let args = &app_state.args;
+    let logger = &app_state.logger;
 
-    let mut client = reqwest::blocking::ClientBuilder::new();
+    let mut client = reqwest::ClientBuilder::new();
 
     let tor_proxy = format!("socks5h://{}:{}", args.tor_bind_address, args.tor_port);
 
@@ -23,14 +23,15 @@ fn verify_repo(repo: &String, app_state: &AppState) {
 
     client
         .build()
-        .unwrap()
+        .unwrap_or_else(|e| {
+            logger.log_error(&format!("Failed to connect to the repo: {}", e));
+            exit(1)
+        })
         .get(repo)
         .send()
+        .await
         .unwrap_or_else(|e| {
-            println!(
-                "{}error:{} Failed to connect to the repo: {}",
-                colors.bold_red, colors.reset, e,
-            );
+            logger.log_error(&format!("Failed to connect to the repo: {}", e));
             exit(1)
         });
 }
@@ -55,18 +56,15 @@ pub fn list_repos() -> Vec<String> {
     repos_list
 }
 
-pub fn add_repo(repo: &String, app_state: &AppState) {
-    let colors = &app_state.colors;
+pub async fn add_repo(repo: &String, app_state: &AppState) {
+    let logger = &app_state.logger;
 
     let file_location = format!("{}/repos", get_data_dir());
     let mut output = read_file_to_string(&file_location).unwrap();
 
     for i in output.lines() {
         if i == repo {
-            eprintln!(
-                "{}error:{} The repo you're trying to add already exists in repos list.",
-                colors.bold_red, colors.reset
-            );
+            logger.log_error("The repo you're trying to add already exists in repos list");
             exit(1);
         }
     }
@@ -74,43 +72,35 @@ pub fn add_repo(repo: &String, app_state: &AppState) {
     output = format!("{}\n{}", output, repo);
 
     // Check if the repo responds
-    verify_repo(repo, app_state);
+    verify_repo(repo, app_state).await;
 
     write_to_file(&file_location, output);
 
-    println!(
-        "{}success:{} Added and verified the repo.",
-        colors.bold_green, colors.reset
-    );
+    logger.log_success("Added and verified the repo.");
+
+    exit(0)
 }
 
 pub fn del_repo(repo: String) {
-    let colors = Colors::new();
+    let logger = get_global_logger();
 
     let repos_file_location = format!("{}/repos", get_data_dir());
 
     if Path::new(&repos_file_location).exists() {
         let mut repos = read_file_to_string(&repos_file_location).unwrap();
         if !repos.contains(&repo) {
-            eprintln!(
-                "{}error:{} The repo you're trying to delete doesn't exist",
-                colors.bold_red, colors.reset
-            );
+            logger.log_error("The repo you're trying to delete doesn't exist");
+
             exit(1);
         }
         repos = repos.replace(&repo, "").replace("\n\n", "\n");
         write_to_file(&repos_file_location, repos);
-        println!(
-            "{}success:{} Deleted {} from the repo list.",
-            colors.bold_green, colors.reset, repo
-        );
+        logger.log_success(&format!("Deleted {} from the repo list.", repo));
     } else {
-        eprintln!(
-            "{}error:{} Failed to delete {} from the repo list, because the repo list doesn't exist.",
-            colors.bold_red,
-            colors.reset,
+        logger.log_error(&format!(
+            "Failed to delete {} from the repo list, because the repo list doesn't exist.",
             repo
-        );
+        ));
         exit(1);
     }
 }

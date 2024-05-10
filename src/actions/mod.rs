@@ -10,7 +10,6 @@ pub use crate::{
     sync::sync, write::write_to_file,
 };
 
-pub mod add_repo;
 pub mod add_repo_preset;
 pub mod apply;
 pub mod backup;
